@@ -13,6 +13,10 @@ from textual.widget import Widget
 from textual.widgets import Button, Header, Footer, Label, Markdown
 from textual.containers import HorizontalGroup, VerticalScroll, Vertical
 
+import ical_helpers as ih
+
+from datetime import datetime, timedelta
+
 if TYPE_CHECKING:
     from typing_extensions import Final
 
@@ -20,30 +24,15 @@ if TYPE_CHECKING:
 class EventCell(Button):
     """A calendar event"""
 
-    @staticmethod
-    def on(startTime = "0800", endTime = "0900", startDay = "Monday") -> str:
-        """Get the ID of the event at the given location
-
-        Args:
-            startTime (str): time at which the event starts
-            endTime (str): time at which the event ends
-        
-        TODO: this id is not always unique: get id from calDav instead later
-        """
-        return f"event-{startTime}-{endTime}-{startDay}"
-    
-    def __init__(self, startTime: str, endTime: str, startDay: str, startDate = "01.01.1970", endDate = "01.01.1970") -> None:
+    def __init__(self, ical_event) -> None:
         """Initialize the event
 
         Args: TODO
 
         TODO: get the dates and times from calDav later
         """
-        super().__init__(self.on(startTime, endTime, startDay), id=self.on(startTime, endTime, startDay))
-        self.startTime = startTime
-        self.endTime = endTime
-        self.startDate = startDate
-        self.endDate = endDate
+        super().__init__(ical_event["summary"], id="id"+ical_event["uid"])
+        self.ical_event = ical_event
 
 class WeekGrid(Widget):
     """The main Grid of events of a week
@@ -64,11 +53,30 @@ class WeekGrid(Widget):
         """
         prototypeCount = 0
 
+        #-----------------------
+        # generating week-array
+        #-----------------------
+        #TODO: make this into passable parameters
+        ics_path = Path("./ETH_timetable.ics")
+        current_week_monday = datetime(2024, 9, 16, 00, 00, 00)
+
+        try:
+            events_this_week = ih.get_week_events(current_week_monday, ics_path)
+        except FileNotFoundError:
+            print(f"ICS file not found at {ics_path}")
+        except Exception as e:
+            print(f"Error reading calendar: {e}")
+        
+        #-----------------------
+        # generate the buttons
+        #-----------------------
+
         # create a row column of times
         # timesList = Vertical(*[Label(str(i)+":00\n\n", classes="timesLabel") for i in range(24)], classes="timesContainer")
         #TODO: make it so the top bar is not part of the weekgrid, that way the days stay on top
+        
+        # generate leftmost columnn of hours
         timesList = [Label("time", classes="weekdayLabel")]
-
         timesList+=[Label(str(i)+":00", classes="timesLabel") for i in range(24)]
 
         timesListVertical = Vertical(*timesList, classes="timesContainer")
@@ -76,20 +84,11 @@ class WeekGrid(Widget):
         # create the actual entries
         weekList = [timesListVertical]
         #weekList = []
-        for day in self.WEEK_DAYS:
+        for day, dayIndex in zip(self.WEEK_DAYS, [i for i in range(7)]):
             dayList = [Label(day, classes="weekdayLabel")]
-            for start, end in self.DUMMY_EVENTS:
-
-                # TODO: remove eventually, just prototyping stuff
-                #---------------------
-                prototypeCount += 1
-
-                cell = EventCell(start, end, day)
-                if prototypeCount%5==0:
-                    cell.styles.height = 10;
-
-                dayList.append(cell)
-                #----------------------
+            for event in (x for x in events_this_week if x["weekday"]==dayIndex):
+            #for event in events_this_week:
+                dayList.append(EventCell(event))
             
             # Create a Vertical container for each day
             dayContainer = Vertical(*dayList, classes="dayContainer")
