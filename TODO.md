@@ -1,0 +1,1 @@
+- may need extra ical packages: https://icalendar.readthedocs.io/en/stable/#related-projects
