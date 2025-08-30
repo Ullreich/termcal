@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
@@ -14,6 +15,8 @@ from textual.widgets import Button, Header, Footer, Label, Rule, Markdown
 from textual.containers import HorizontalGroup, VerticalScroll, Vertical, Center, Middle
 
 import ical_helpers as ih
+import general_helpers as gh
+import argparsing as ap
 
 from datetime import datetime, timedelta
 
@@ -89,6 +92,17 @@ class WeekGrid(Widget):
     """
     DUMMY_EVENTS = [["0900", "1100"], ["1200", "1500"], ["2000", "2100"]]
 
+    def __init__(self, ics_path: Path, week_start: datetime) -> None:
+        """Initialize the WeekGrid with calendar path and week start date.
+        
+        Args:
+            ics_path: Path to the ICS calendar file
+            week_start: Start date of the week (Monday)
+        """
+        super().__init__()
+        self.ics_path = ics_path
+        self.week_start = week_start
+
 
     def compose(self) -> ComposeResult:
         """Compose the week grid.
@@ -101,16 +115,14 @@ class WeekGrid(Widget):
         #-----------------------
         # generating week-array
         #-----------------------
-        #TODO: make this into passable parameters
-        ics_path = Path("./ETH_timetable.ics")
-        current_week_monday = datetime(2024, 9, 16, 00, 00, 00)
-
         try:
-            events_this_week = ih.get_week_events(current_week_monday, ics_path)
+            events_this_week = ih.get_week_events(self.week_start, self.ics_path)
         except FileNotFoundError:
-            print(f"ICS file not found at {ics_path}")
+            print(f"ICS file not found at {self.ics_path}")
+            events_this_week = []
         except Exception as e:
             print(f"Error reading calendar: {e}")
+            events_this_week = []
         
         #-----------------------
         # generate the buttons
@@ -153,9 +165,20 @@ class Week(App):
     BINDINGS = [
         ("q", "quit", "Quit App")
     ]
+    
+    def __init__(self, ics_path: Path, week_start: datetime) -> None:
+        """Initialize the Week app with calendar path and week start date.
+        
+        Args:
+            ics_path: Path to the ICS calendar file
+            week_start: Start date of the week (Monday)
+        """
+        super().__init__()
+        self.ics_path = ics_path
+        self.week_start = week_start
 
     def compose(self) -> ComposeResult:
-        yield WeekGrid()
+        yield WeekGrid(self.ics_path, self.week_start)
         yield Header()
         yield Footer()
 
@@ -174,4 +197,16 @@ class Week(App):
         self.theme = "nord"
 
 if __name__ == "__main__":
-    Week().run()
+    try:
+        args = ap.parse_arguments()
+        ics_path, week_start = ap.validate_arguments(args)
+        
+        app = Week(ics_path, week_start)
+        app.run()
+        
+    except KeyboardInterrupt:
+        print("\nExiting...", file=sys.stderr)
+        sys.exit(0)
+    except Exception as e:
+        print(f"Unexpected error: {e}", file=sys.stderr)
+        sys.exit(1)

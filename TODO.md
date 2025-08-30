@@ -1,3 +1,6 @@
 - [ ] may need extra ical packages: https://icalendar.readthedocs.io/en/stable/#related-projects
 - [ ] make links in description clickable: https://textual.textualize.io/widgets/link/#__tabbed_1_2
 - [ ] make css reactive
+
+# command line args
+- [ ] default date to today
