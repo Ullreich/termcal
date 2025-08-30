@@ -10,8 +10,8 @@ from textual.css.query import DOMQuery
 from textual.reactive import reactive
 from textual.screen import Screen
 from textual.widget import Widget
-from textual.widgets import Button, Header, Footer, Label, Markdown
-from textual.containers import HorizontalGroup, VerticalScroll, Vertical
+from textual.widgets import Button, Header, Footer, Label, Rule, Markdown
+from textual.containers import HorizontalGroup, VerticalScroll, Vertical, Center, Middle
 
 import ical_helpers as ih
 
@@ -19,6 +19,8 @@ from datetime import datetime, timedelta
 
 if TYPE_CHECKING:
     from typing_extensions import Final
+
+WEEK_DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
 
 class EventCell(Button):
@@ -34,14 +36,57 @@ class EventCell(Button):
         super().__init__(ical_event["summary"], id="id"+ical_event["uid"])
         self.ical_event = ical_event
 
+
+class EventScreen(Screen):
+    """A screen that displays details for a specific calendar event."""
+
+    BINDINGS = [("escape,space,q", "app.pop_screen", "Close")]
+    """Bindings for the event screen."""
+
+    def __init__(self, ical_event: dict) -> None:
+        """Initialize the event screen with event data.
+        
+        Args:
+            ical_event: The calendar event data to display
+        """
+        super().__init__()
+        self.ical_event = ical_event
+
+    def compose(self) -> ComposeResult:
+        """Compose the event screen.
+
+        Returns:
+            ComposeResult: The result of composing the event screen.
+        """
+        with VerticalScroll():
+            yield Label(f"{self.ical_event['summary']}", id="eventTitle")
+            yield Rule(line_style="ascii")
+            yield Label(f"Start: {WEEK_DAYS[self.ical_event['weekday']]}, the {self.ical_event['start']}", id="eventStart")
+            yield Label(f"End: {WEEK_DAYS[self.ical_event['weekday']]}, the {self.ical_event['end']}", id="eventEnd")
+            if self.ical_event.get('location'):
+                yield Label(f"Location: {self.ical_event['location']}", id="eventLocation")
+            if self.ical_event.get('description'):
+                yield Label(f"Description: {self.ical_event['description']}", id="eventDescription")
+        with Center():
+            yield Button("Close", id="closeButton")
+            yield Footer()
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        """Handle button press events.
+
+        Args:
+            event: The button press event.
+        """
+        if event.button.id == "closeButton":
+            self.app.pop_screen()
+
+
 class WeekGrid(Widget):
     """The main Grid of events of a week
     
     Returns:
         ComposeResult: The result of adding all events into a week grid view
     """
-
-    WEEK_DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     DUMMY_EVENTS = [["0900", "1100"], ["1200", "1500"], ["2000", "2100"]]
 
 
@@ -84,7 +129,7 @@ class WeekGrid(Widget):
         # create the actual entries
         weekList = [timesListVertical]
         #weekList = []
-        for day, dayIndex in zip(self.WEEK_DAYS, [i for i in range(7)]):
+        for day, dayIndex in zip(WEEK_DAYS, [i for i in range(7)]):
             dayList = [Label(day, classes="weekdayLabel")]
             for event in (x for x in events_this_week if x["weekday"]==dayIndex):
             #for event in events_this_week:
@@ -113,6 +158,17 @@ class Week(App):
         yield WeekGrid()
         yield Header()
         yield Footer()
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        """Handle button press events.
+
+        Args:
+            event: The button press event.
+        """
+        if isinstance(event.button, EventCell):
+            # Create a new EventScreen instance with the event data
+            event_screen = EventScreen(event.button.ical_event)
+            self.push_screen(event_screen)
 
     def on_mount(self) -> None:
         self.theme = "nord"

@@ -24,3 +24,39 @@
     width: 13vw;
     height: auto;
 }
+
+/* Event Screen */
+
+EventScreen {
+    /* padding: 2 5 0 5; */
+}
+
+EventScreen Footer {
+    padding: 0;
+}
+
+EventScreen Label {
+    padding: 0 5 0 5;
+}
+
+EventScreen Rule {
+    padding: 0 5 0 5;
+}
+
+#eventTitle {
+    text-align: center;
+    width: 100%;
+    padding: 2 5 0 5;
+}
+
+#eventDescription {
+    text-wrap: wrap;
+    width: 100%;
+    /* max-width: 80%; */
+    overflow: auto;
+}
+
+#closeButton {
+    width: auto;
+    /* margin: 0 0 0 0; */
+}
