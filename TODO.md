@@ -10,7 +10,7 @@
 # next/prev week
 - [x] add key commands to go to next/prev week
 - [ ] add way to write desired week into command?
-- [ ] change header to display current week
+- [x] change header to display current week
 
 # alignment
 - [ ] think about how to best align/format the buttons
@@ -35,3 +35,6 @@
 - [ ] make all variables lower_case_with_underscores instead of CapitalizedWords
 - [ ] rename some variables?
 - [ ] make pep8 compliant: get vscode plugin
+
+# bugs:
+- [x] disable next and previous week when on eventScreen

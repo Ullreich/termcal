@@ -25,7 +25,6 @@ if TYPE_CHECKING:
 
 WEEK_DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
-
 class EventCell(Button):
     """A calendar event"""
 
@@ -82,6 +81,7 @@ class EventScreen(Screen):
         """
         if event.button.id == "closeButton":
             self.app.pop_screen()
+
 
 
 class WeekGrid(Widget):
@@ -208,6 +208,24 @@ class Week(App):
         """Navigate to the previous week."""
         self.week_start -= timedelta(days=7)
         self.refresh(recompose=True)
+
+    def check_action(self, action: str, parameters) -> bool:
+        """Disable certain actions when EventScreen is active.
+        
+        Args:
+            action: The action name to check
+            parameters: Action parameters
+            
+        Returns:
+            bool: False if the action should be disabled, True otherwise
+        """
+        # Disable week navigation when EventScreen is active
+        if action in ("next_week", "previous_week"):
+            # Check if there are any EventScreen instances in the screen stack
+            for screen in self.screen_stack:
+                if isinstance(screen, EventScreen):
+                    return False
+        return super().check_action(action, parameters)
 
 if __name__ == "__main__":
     try:
