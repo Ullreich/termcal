@@ -110,8 +110,6 @@ class WeekGrid(Widget):
         Returns:
             ComposeResult: the result of composing the events into the week grid.
         """
-        prototypeCount = 0
-
         #-----------------------
         # generating week-array
         #-----------------------
@@ -133,7 +131,7 @@ class WeekGrid(Widget):
         #TODO: make it so the top bar is not part of the weekgrid, that way the days stay on top
         
         # generate leftmost columnn of hours
-        timesList = [Label("time", classes="weekdayLabel")]
+        timesList = [Label("time\n", classes="weekdayLabel")]
         timesList+=[Label(str(i)+":00", classes="timesLabel") for i in range(24)]
 
         timesListVertical = Vertical(*timesList, classes="timesContainer")
@@ -142,7 +140,9 @@ class WeekGrid(Widget):
         weekList = [timesListVertical]
         #weekList = []
         for day, dayIndex in zip(WEEK_DAYS, [i for i in range(7)]):
-            dayList = [Label(day, classes="weekdayLabel")]
+            shifted_day = self.week_start + timedelta(days=dayIndex)
+            formatted_date_str = day + "\n" + str(shifted_day.day) + "." + str(shifted_day.month) + "." + str(shifted_day.year)
+            dayList = [Label(formatted_date_str, classes="weekdayLabel")]
             for event in (x for x in events_this_week if x["weekday"]==dayIndex):
             #for event in events_this_week:
                 dayList.append(EventCell(event))
@@ -163,7 +163,9 @@ class Week(App):
     CSS_PATH = "week_prototype.tcss"
 
     BINDINGS = [
-        ("q", "quit", "Quit App")
+        ("q", "quit", "Quit App"),
+        ("n", "next_week", "Next Week"),
+        ("p", "previous_week", "Previous Week")
     ]
     
     def __init__(self, ics_path: Path, week_start: datetime) -> None:
@@ -195,6 +197,17 @@ class Week(App):
 
     def on_mount(self) -> None:
         self.theme = "nord"
+        # self.title = self.week_start
+
+    def action_next_week(self) -> None:
+        """Navigate to the next week."""
+        self.week_start += timedelta(days=7)
+        self.refresh(recompose=True)
+
+    def action_previous_week(self) -> None:
+        """Navigate to the previous week."""
+        self.week_start -= timedelta(days=7)
+        self.refresh(recompose=True)
 
 if __name__ == "__main__":
     try:
