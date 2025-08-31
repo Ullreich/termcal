@@ -16,6 +16,7 @@ from textual.containers import HorizontalGroup, VerticalScroll, Vertical, Center
 
 import ical_helpers as ih
 import general_helpers as gh
+import layout_helpers as lh
 import argparsing as ap
 
 from datetime import datetime, timedelta
@@ -133,7 +134,7 @@ class WeekGrid(Widget):
         
         # generate leftmost columnn of hours
         timesList = [Label("time\n", classes="weekdayLabel")]
-        timesList+=[Label(str(i)+":00", classes="timesLabel") for i in range(24)]
+        timesList += [Label(str(i)+":00", classes="timesLabel") for i in range(24)]
 
         timesListVertical = Vertical(*timesList, classes="timesContainer")
 
@@ -144,11 +145,19 @@ class WeekGrid(Widget):
             shifted_day = self.week_start + timedelta(days=dayIndex)
             formatted_date_str = day + "\n" + str(shifted_day.day) + "." + str(shifted_day.month) + "." + str(shifted_day.year)
             dayList = [Label(formatted_date_str, classes="weekdayLabel")]
-            for event in (x for x in events_this_week if x["weekday"]==dayIndex):
-            #for event in events_this_week:
-                dayList.append(EventCell(event))
+
+            overlap_list = lh.overlap_list([x for x in events_this_week if x["weekday"]==dayIndex])
+            #TODO: remove eventually
+            # lh.write_overlap_list(overlap_list)
+
+            # for event in (x for x in events_this_week if x["weekday"]==dayIndex):
+            # for event in events_this_week:
+            if len(overlap_list) != 0:
+                for event in overlap_list[0]:
+                    dayList.append(EventCell(event))
             
             # Create a Vertical container for each day
+            # TODO: make a vertical scroll container
             dayContainer = Vertical(*dayList, classes="dayContainer")
             weekList.append(dayContainer)
         

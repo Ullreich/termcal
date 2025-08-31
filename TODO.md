@@ -1,11 +1,13 @@
+# small/random stuff
 - [ ] may need extra ical packages: https://icalendar.readthedocs.io/en/stable/#related-projects
 - [ ] make links in description clickable: https://textual.textualize.io/widgets/link/#__tabbed_1_2
 - [ ] make css reactive
 - [ ] account for multi-day events
 - [ ] how to properly add venv to git?
+- [ ] set font size on start
 
 # command line args
-- [ ] default date to today
+- [x] default date to today
 
 # next/prev week
 - [x] add key commands to go to next/prev week
