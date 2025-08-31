@@ -20,7 +20,7 @@
   - [x] correctly size buttons based on duration
   - [ ] account for multi-day events
   - [ ] make resolution more modular/editable by user?
-  - [ ] detatch day/time indicator and pin to top (along with overlapping event indicator?)
+  - [x] detatch day/time indicator and pin to top (along with overlapping event indicator?)
   - [ ] on start/switching of week, start at 8:00
   - [x] assert cell height at least 1
   - [ ] sort list of list of events by number of events in list

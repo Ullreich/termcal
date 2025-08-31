@@ -1,20 +1,35 @@
 $hour_height: 4;
+$bar_height: 2;
 
-.weekdayLabel {
+.topBar {
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+    height: $bar_height;
+}
+
+.timesTopBar {
     text-align: center;
-    width: 13vw;
-    min-width: 15;
-     /*background: $primary;*/
-     color: $primary;
+    width: 9vw;
+    background: $surface;
+    color: $primary;
+    padding: 1 0 0 0;
+    height: $bar_height
+}
+
+.weekdayTopBar {
+    text-align: center;
+    width: 13%;
+    background: $surface;
+    color: $primary;
+    height: $bar_height;
 }
 
 .timesLabel {
     text-align: center;
     width: 9vw;
-    min-width: 15;
-     /*background: $primary;*/
-     color: $primary;
-     height: $hour_height;
+    background: $surface;
+    color: $primary;
+    height: $hour_height;
 }
 
 .timesContainer {
@@ -33,7 +48,6 @@ EventCell {
     width: 100%;
     /* max-width: 80%; */
     overflow: auto;
-
 }
 
 /* Event Screen */

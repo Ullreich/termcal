@@ -92,8 +92,6 @@ class WeekGrid(Widget):
     Returns:
         ComposeResult: The result of adding all events into a week grid view
     """
-    DUMMY_EVENTS = [["0900", "1100"], ["1200", "1500"], ["2000", "2100"]]
-
     def __init__(self, ics_path: Path, week_start: datetime) -> None:
         """Initialize the WeekGrid with calendar path and week start date.
         
@@ -127,24 +125,29 @@ class WeekGrid(Widget):
         #-----------------------
         # generate the buttons
         #-----------------------
-
-        # create a row column of times
-        # timesList = Vertical(*[Label(str(i)+":00\n\n", classes="timesLabel") for i in range(24)], classes="timesContainer")
-        #TODO: make it so the top bar is not part of the weekgrid, that way the days stay on top
         
-        # generate leftmost columnn of hours
-        timesList = [Label("time\n", classes="weekdayLabel")]
-        timesList += [Label(str(i)+":00", classes="timesLabel") for i in range(24)]
+        # generate the top bar
+        # TODO: clean up this code, put in function or something since it's copy-pasted from below
+        dayList = []
+        for day, dayIndex in zip(WEEK_DAYS, [i for i in range(7)]):
+            shifted_day = self.week_start + timedelta(days=dayIndex)
+            formatted_date_str = day + "\n" + str(shifted_day.day) + "." + str(shifted_day.month) + "." + str(shifted_day.year)
+            dayList += [Label(formatted_date_str, classes="weekdayTopBar")]
+        
+        yield HorizontalGroup(
+            Label("time\n", classes="timesTopBar"),
+            *dayList,
+            classes="topBar"
+        )
 
+        # create a column of times
+        timesList = [Label(str(i)+":00", classes="timesLabel") for i in range(24)]
         timesListVertical = Vertical(*timesList, classes="timesContainer")
 
         # create the actual entries
         weekList = [timesListVertical]
-        #weekList = []
         for day, dayIndex in zip(WEEK_DAYS, [i for i in range(7)]):
-            shifted_day = self.week_start + timedelta(days=dayIndex)
-            formatted_date_str = day + "\n" + str(shifted_day.day) + "." + str(shifted_day.month) + "." + str(shifted_day.year)
-            dayList = [Label(formatted_date_str, classes="weekdayLabel")]
+            dayList = []
 
             overlap_list = lh.overlap_list([x for x in events_this_week if x["weekday"]==dayIndex])
             if len(overlap_list) != 0:
@@ -164,7 +167,6 @@ class WeekGrid(Widget):
                     dayList.append(event_in_cell)
             
             # Create a Vertical container for each day
-            # TODO: make a vertical scroll container
             dayContainer = Vertical(*dayList, classes="dayContainer")
             weekList.append(dayContainer)
         
