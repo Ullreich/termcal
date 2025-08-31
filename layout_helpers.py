@@ -46,7 +46,7 @@ def timedelta_to_cell_height(timedelta, hour_height=4):
     hours = (floor(sec/3600)) * hour_height
     minutes = round_resolution((1/60) * ((sec/60)%60)) * hour_height
 
-    return hours + minutes
+    return max(hours + minutes, 1)
 
 
 def round_resolution(value, resolution=0.25):
