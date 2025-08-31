@@ -25,6 +25,8 @@ if TYPE_CHECKING:
     from typing_extensions import Final
 
 WEEK_DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+HOUR_HEIGHT = 4
+
 
 class EventCell(Button):
     """A calendar event"""
@@ -103,6 +105,13 @@ class WeekGrid(Widget):
         self.ics_path = ics_path
         self.week_start = week_start
 
+    def on_mount(self) -> None:
+        """Called when the WeekGrid is mounted. Set initial scroll position."""
+        # Set initial scroll position to around 8 AM (adjust as needed)
+        scroll_widget = self.query_one("#week-scroll", VerticalScroll)
+        initial_scroll_y = 8 * HOUR_HEIGHT
+        self.call_after_refresh(lambda: scroll_widget.scroll_to(y=initial_scroll_y, animate=False))
+
 
     def compose(self) -> ComposeResult:
         """Compose the week grid.
@@ -174,7 +183,8 @@ class WeekGrid(Widget):
         weekGroup = HorizontalGroup(*weekList)
         weekGroup.styles.height = "auto"
         
-        yield VerticalScroll(weekGroup)
+        # Create VerticalScroll with an ID so we can access it later
+        yield VerticalScroll(weekGroup, id="week-scroll")
 
 class Week(App):
     """Main week view class."""
