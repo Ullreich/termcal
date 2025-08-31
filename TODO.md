@@ -19,7 +19,8 @@
   - [ ] account for multi-day events
 
 # coloring
-- [ ] add coloring for event through function that maps title to color?
+- [x] add coloring for event through function that maps title to color?
+  - [ ] depending on if light or dark color theme, edit function
 - [ ] let person set color for event(s)
 
 # tests
@@ -36,5 +37,13 @@
 - [ ] rename some variables?
 - [ ] make pep8 compliant: get vscode plugin
 
+# implement calDav
+
 # bugs:
 - [x] disable next and previous week when on eventScreen
+  
+# possibility for editing eventCells
+- either all of the same title or just single one
+  - edit all by iterating over whole dataset and replacing each probs
+  - background color
+  - name/time/etc

@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import re
 from typing import Optional
+from textual.color import Color
 
 
 def get_week_start_from_date(date_input: str) -> datetime:
@@ -74,3 +75,27 @@ def validate_date_format(date_string: str) -> bool:
         return True
     except ValueError:
         return False
+    
+def convert_summary_to_color(summary: str) -> Color:
+    """
+    Convert a string to a textual Color in r,g,b
+
+    Args:
+        summary: the summary of a eventCell
+    
+    Returns:
+        Color: a textual Color
+
+    This fomula was kinda just invented with the following reasoning:
+    dividing the string into 3 equal length parts, converting to bistring
+    so that we can do math on it and always get same color for same summary.
+    The * 57 should not be too expensive, computationally and randomize the colors
+    of very similar names through a little 
+    """
+    bitstring = summary.encode("utf-8")
+
+    r = (57 * (sum(bitstring[:int(len(bitstring)/3)]) % 255)) % 192
+    g = (57 * (sum(bitstring[int(len(bitstring)/3):int(2*len(bitstring)/3)])) % 255) % 192
+    b = (57 * (sum(bitstring[int(2*len(bitstring)/3):]) % 255)) % 192
+
+    return Color(r,g,b)

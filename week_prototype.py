@@ -37,6 +37,7 @@ class EventCell(Button):
         """
         super().__init__(ical_event["summary"], id="id"+ical_event["uid"])
         self.ical_event = ical_event
+        self.styles.background = gh.convert_summary_to_color(self.ical_event["summary"])
 
 
 class EventScreen(Screen):
