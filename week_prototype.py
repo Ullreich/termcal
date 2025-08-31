@@ -147,14 +147,21 @@ class WeekGrid(Widget):
             dayList = [Label(formatted_date_str, classes="weekdayLabel")]
 
             overlap_list = lh.overlap_list([x for x in events_this_week if x["weekday"]==dayIndex])
+            if len(overlap_list) != 0:
+                height, padding = lh.calc_padding_and_height(overlap_list[0])
+
             #TODO: remove eventually
             # lh.write_overlap_list(overlap_list)
 
             # for event in (x for x in events_this_week if x["weekday"]==dayIndex):
             # for event in events_this_week:
             if len(overlap_list) != 0:
-                for event in overlap_list[0]:
-                    dayList.append(EventCell(event))
+                for event, i in zip(overlap_list[0], range(len(overlap_list[0]))):
+                    event_in_cell = EventCell(event)
+                    event_in_cell.styles.height = height[i]
+                    event_in_cell.styles.margin = (padding[i], 0, 0, 0)  # (top, right, bottom, left) - vertical spacing
+
+                    dayList.append(event_in_cell)
             
             # Create a Vertical container for each day
             # TODO: make a vertical scroll container

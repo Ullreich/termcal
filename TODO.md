@@ -15,9 +15,9 @@
 - [x] change header to display current week
 
 # alignment
-- [ ] think about how to best align/format the buttons
-  - [ ] perhaps no buttons for times without events?
-  - [ ] correctly size buttons based on duration
+- [x] think about how to best align/format the buttons
+  - [x] perhaps no buttons for times without events?
+  - [x] correctly size buttons based on duration
   - [ ] account for multi-day events
 
 # coloring

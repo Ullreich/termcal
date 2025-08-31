@@ -1,3 +1,5 @@
+$hour_height: 4;
+
 .weekdayLabel {
     text-align: center;
     width: 13vw;
@@ -12,7 +14,7 @@
     min-width: 15;
      /*background: $primary;*/
      color: $primary;
-     padding: 0 0 2 0;
+     height: $hour_height;
 }
 
 .timesContainer {
@@ -23,6 +25,15 @@
 .dayContainer {
     width: 13vw;
     height: auto;
+}
+
+EventCell {
+    height: $hour_height;
+    text-wrap: wrap;
+    width: 100%;
+    /* max-width: 80%; */
+    overflow: auto;
+
 }
 
 /* Event Screen */
