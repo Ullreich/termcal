@@ -5,6 +5,7 @@
 - [ ] account for multi-day events
 - [ ] how to properly add venv to git?
 - [ ] set font size on start
+- [ ] split up functions and classes into files?
 
 # command line args
 - [x] default date to today
@@ -29,19 +30,30 @@
 - [x] add coloring for event through function that maps title to color?
   - [ ] depending on if light or dark color theme, edit function
 - [ ] let person set color for event(s)
+- [ ] set color based on calendar (all events same color)
+  - [ ] two modes: calendar/default and timetable
 
 # tests
 - [ ] add unittests
 
 # add keyboard navigation
 - [ ] add vim keybinds?
-- [ ] add screen that shows all key commands
+- [ ] add screen that shows all key commands (already available (editable?) under palette)
 - [ ] mouse button to escape from event view?
 
 # cleanup/refactoring
 - [ ] make all variables lower_case_with_underscores instead of CapitalizedWords
 - [ ] rename some variables?
 - [ ] make pep8 compliant: get vscode plugin
+
+# edit/add new events
+- [ ] implement a edit event in eventScreen
+- [ ] implement a new event screen
+  - [ ] add inputted data to current calendar
+    - [ ] does icalendar validate the data or do i need to do it? You can create custom validators
+    - [ ] what type of inputtable variables exist?
+  - [ ] select button of which calendar(s) to add event to
+  - [ ] delete event(s)
 
 # implement calDav
 
@@ -53,10 +65,10 @@
 - [x] fix position of time:  when resize sometimes cuts off the right hand side
   
 # possibility for editing eventCells
-- either all of the same title or just single one
-  - edit all by iterating over whole dataset and replacing each probs
-  - background color
-  - name/time/etc
+- [ ] either all of the same title or just single one
+  - [ ] edit all by iterating over whole dataset and replacing each probs
+- [ ] background color
+- [ ] name/time/etc
 
 # config file
 - [ ] edit key binds
