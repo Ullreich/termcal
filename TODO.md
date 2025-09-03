@@ -40,6 +40,7 @@
 - [ ] add vim keybinds?
 - [ ] add screen that shows all key commands (already available (editable?) under palette)
 - [ ] mouse button to escape from event view?
+- [ ] make esc/q consistent
 
 # cleanup/refactoring
 - [ ] make all variables lower_case_with_underscores instead of CapitalizedWords
@@ -54,6 +55,10 @@
     - [ ] what type of inputtable variables exist?
   - [ ] select button of which calendar(s) to add event to
   - [ ] delete event(s)
+- [ ] edit either all of the same title or just single one
+  - [ ] edit all by iterating over whole dataset and replacing each probs
+- [ ] background color
+- [ ] name/time/etc
 
 # implement calDav
 
@@ -63,12 +68,6 @@
 - [x] disable next and previous week when on eventScreen
 - [ ] fix width of button text: when resize sometimes cuts off the right hand side
 - [x] fix position of time:  when resize sometimes cuts off the right hand side
-  
-# possibility for editing eventCells
-- [ ] either all of the same title or just single one
-  - [ ] edit all by iterating over whole dataset and replacing each probs
-- [ ] background color
-- [ ] name/time/etc
 
 # config file
 - [ ] edit key binds

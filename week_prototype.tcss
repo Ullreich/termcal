@@ -2,8 +2,6 @@ $hour_height: 4;
 $bar_height: 2;
 
 .topBar {
-    margin: 0 0 0 0;
-    padding: 0 0 0 0;
     height: $bar_height;
 }
 
@@ -50,28 +48,23 @@ EventCell {
     overflow: auto;
 }
 
-/* Event Screen */
+/* ------------- Event Screen ------------- */
 
 EventScreen {
-    /* padding: 2 5 0 5; */
-}
-
-EventScreen Footer {
-    padding: 0;
 }
 
 EventScreen Label {
-    padding: 0 5 0 5;
+    margin: 0 5 0 5;
 }
 
 EventScreen Rule {
-    padding: 0 5 0 5;
+    margin: 0 5 0 5;
 }
 
 #eventTitle {
     text-align: center;
     width: 100%;
-    padding: 2 5 0 5;
+    margin: 2 5 0 5;
 }
 
 #eventDescription {
@@ -83,5 +76,30 @@ EventScreen Rule {
 
 #closeButton {
     width: auto;
-    /* margin: 0 0 0 0; */
+    margin: 0 0 1 0;
+}
+
+/* -------------- New Event Screen ------------- */
+
+#newEventTitle {
+    text-align: center;
+    width: 100%;
+    margin: 2 5 0 5;
+}
+
+NewEventScreen Input {
+    margin: 1 5 1 5;
+}
+
+NewEventScreen Label {
+    margin: 0 5 0 5;
+}
+
+NewEventScreen Rule {
+    margin: 0 5 0 5;
+}
+
+NewEventScreen HorizontalGroup {
+    align: center middle;
+    margin: 0 0 1 0;
 }

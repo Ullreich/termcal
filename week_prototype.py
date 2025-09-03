@@ -120,7 +120,7 @@ class NewEventScreen(Screen):
             yield Input(placeholder="Enter description", id="eventDescription")
             yield Rule(line_style="ascii")
             yield Label("", id="errorMessage")  # For showing validation errors
-        with Center():
+        with HorizontalGroup():
             yield Button("Save Event", id="saveButton", variant="success")
             yield Button("Cancel", id="cancelButton", variant="error")
         yield Footer()
@@ -357,7 +357,7 @@ class Week(App):
 
 
     def check_action(self, action: str, parameters) -> bool:
-        """Disable certain actions when EventScreen is active.
+        """Disable certain actions when EventScreen or NewEventScreen is active.
         
         Args:
             action: The action name to check
@@ -366,11 +366,11 @@ class Week(App):
         Returns:
             bool: False if the action should be disabled, True otherwise
         """
-        # Disable week navigation when EventScreen is active
-        if action in ("next_week", "previous_week", "new_event_screen"):
-            # Check if there are any EventScreen instances in the screen stack
+        # Disable week navigation when EventScreen or NewEventScreen is active
+        if action in ("next_week", "previous_week", "new_event_screen", "quit"):
+            # Check if there are any EventScreen or NewEventScreen instances in the screen stack
             for screen in self.screen_stack:
-                if isinstance(screen, EventScreen):
+                if isinstance(screen, (EventScreen, NewEventScreen)):
                     return False
         return super().check_action(action, parameters)
 
