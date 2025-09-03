@@ -2,7 +2,7 @@ import argparse
 import sys
 from pathlib import Path
 from datetime import datetime
-import general_helpers as gh
+from helpers import general_helpers as gh
 
 def parse_arguments():
     """Parse command line arguments."""

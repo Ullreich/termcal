@@ -44,7 +44,6 @@ EventCell {
     height: $hour_height;
     text-wrap: wrap;
     width: 100%;
-    /* max-width: 80%; */
     overflow: auto;
 }
 
@@ -70,7 +69,6 @@ EventScreen Rule {
 #eventDescription {
     text-wrap: wrap;
     width: 100%;
-    /* max-width: 80%; */
     overflow: auto;
 }
 

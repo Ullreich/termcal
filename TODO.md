@@ -5,7 +5,6 @@
 - [ ] account for multi-day events
 - [ ] how to properly add venv to git?
 - [ ] set font size on start
-- [ ] split up functions and classes into files?
 
 # command line args
 - [x] default date to today
@@ -42,10 +41,13 @@
 - [ ] mouse button to escape from event view?
 - [ ] make esc/q consistent
 
-# cleanup/refactoring
+# cleanup/refactoring/restructuring
 - [ ] make all variables lower_case_with_underscores instead of CapitalizedWords
 - [ ] rename some variables?
 - [ ] make pep8 compliant: get vscode plugin
+- [ ] restructure code
+  - [x] split up functions and classes into files?
+  - [ ] read up on import best practices
 
 # edit/add new events
 - [ ] implement a edit event in eventScreen
