@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Terminal Calendar - Main entry point
 """
@@ -20,10 +19,7 @@ def main():
         
         app = Week(ics_path, week_start)
         app.run()
-        
-    except KeyboardInterrupt:
-        print("\nExiting...", file=sys.stderr)
-        sys.exit(0)
+
     except Exception as e:
         print(f"Unexpected error: {e}", file=sys.stderr)
         sys.exit(1)

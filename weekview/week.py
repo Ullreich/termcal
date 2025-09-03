@@ -1,35 +1,17 @@
 from __future__ import annotations
 
-import sys
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
 
 from textual.app import App, ComposeResult
-from textual.binding import Binding
-from textual.containers import Horizontal
-from textual.css.query import DOMQuery
-from textual.reactive import reactive
-from textual.screen import Screen
-from textual.widget import Widget
-from textual.widgets import Button, Header, Footer, Label, Rule, Input
-from textual.containers import HorizontalGroup, VerticalScroll, Vertical, Center
+from textual.widgets import Button, Header, Footer
 
 from datetime import datetime, timedelta
-
-# Import helper modules using absolute imports
-from helpers import ical_helpers as ih
-from helpers import general_helpers as gh
-from helpers import layout_helpers as lh
-from helpers import argparsing as ap
 
 # Import week view components
 from weekview.WeekGrid import WeekGrid
 from weekview.EventCell import EventCell
 from weekview.Screens.EventScreen import EventScreen
 from weekview.Screens.NewEventScreen import NewEventScreen
-
-# Import global configuration
-import GLOBALS
 
 class Week(App):
     """Main week view class."""
