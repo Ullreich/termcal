@@ -6,6 +6,10 @@
 - [ ] how to properly add venv to git?
 - [ ] set font size on start
 
+ # Popup screen
+  - [ ] move ErrorPopup (in NewEventScreen atm) to a separate file for modular reuse
+  - [ ] fix keycapturing when in popup screen
+
 # command line args
 - [x] default date to today
 
@@ -51,9 +55,11 @@
 
 # edit/add new events
 - [ ] implement a edit event in eventScreen
-- [ ] implement a new event screen
+- [x] implement a new event screen
+  - [ ] make Inputs compact
   - [ ] add inputted data to current calendar
     - [ ] does icalendar validate the data or do i need to do it? You can create custom validators
+    - [ ] validate start/end date (reuse that helper function)
     - [ ] what type of inputtable variables exist?
   - [ ] select button of which calendar(s) to add event to
   - [ ] delete event(s)

@@ -101,3 +101,51 @@ NewEventScreen HorizontalGroup {
     align: center middle;
     margin: 0 0 1 0;
 }
+
+/* -------------- Error Popup ------------- */
+
+ErrorPopup {
+    align: center middle;
+}
+
+#dialog {
+    grid-size: 2;
+    grid-gutter: 1 2;
+    grid-rows: 1fr 3;
+    padding: 0 1;
+    width: 60;
+    height: 11;
+    border: thick $background 80%;
+    background: $surface;
+}
+
+#errorPopup {
+    width: 60;
+    height: 11;
+    border: thick $background 80%;
+    background: $surface;
+    padding: 1;
+    align: center middle;
+}
+
+ErrorPopup Label {
+    text-align: center;
+    width: 100%;
+    margin: 1 0;
+}
+
+ErrorPopup Vertical {
+    align: center middle;
+    height: 100%;
+}
+
+ErrorPopup Button {
+    width: auto;
+    margin: 1 0 0 0;
+    content-align: center middle;
+}
+
+ErrorPopup HorizontalGroup {
+    align: center middle;
+    width: 100%;
+}
