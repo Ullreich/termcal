@@ -1,7 +1,7 @@
 from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.widgets import Button, Footer, Label, Rule
-from textual.containers import VerticalScroll, Center
+from textual.containers import VerticalScroll, Center, Grid
 
 import GLOBALS
 
@@ -29,15 +29,35 @@ class EventScreen(Screen):
         with VerticalScroll():
             yield Label(f"{self.ical_event['summary']}", id="eventTitle")
             yield Rule(line_style="ascii")
-            yield Label(f"Start: {GLOBALS.WEEK_DAYS[self.ical_event['weekday']]}, the {self.ical_event['start']}", id="eventStart")
-            yield Label(f"End: {GLOBALS.WEEK_DAYS[self.ical_event['weekday']]}, the {self.ical_event['end']}", id="eventEnd")
-            if self.ical_event.get('location'):
-                yield Label(f"Location: {self.ical_event['location']}", id="eventLocation")
-            if self.ical_event.get('description'):
-                yield Label(f"Description: {self.ical_event['description']}", id="eventDescription")
-        with Center():
-            yield Button("Close", id="closeButton")
-            yield Footer()
+            with Grid():
+                # Start
+                yield Label("Start:", classes="type")
+                yield Label(f"{GLOBALS.WEEK_DAYS[self.ical_event['weekday']]}, the {self.ical_event['start']}",
+                            id="eventStart",
+                            classes="data")
+
+                # End
+                yield Label("End:", classes="type")
+                yield Label(f"{GLOBALS.WEEK_DAYS[self.ical_event['weekday']]}, the {self.ical_event['end']}",
+                            id="eventEnd",
+                            classes="data")
+                
+                # Location
+                if self.ical_event.get('location'):
+                    yield Label("Location:", classes="type") 
+                    yield Label(f"{self.ical_event['location']}",
+                                id="eventLocation",
+                                classes="data")
+                
+                # Description
+                if self.ical_event.get('description'):
+                    yield Label("Description:", classes="type") 
+                    yield Label(f"{self.ical_event['description']}",
+                                id="eventDescription",
+                                classes="data")
+            with Center():
+                yield Button("Close", id="closeButton")
+        yield Footer()
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Handle button press events.

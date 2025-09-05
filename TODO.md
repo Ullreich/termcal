@@ -5,6 +5,8 @@
 - [ ] account for multi-day events
 - [ ] how to properly add venv to git?
 - [ ] set font size on start
+- [ ] split up css
+- [ ] in EventScreen, the grid-rows parameter is still wonky giving Labels more padding/margins than they need. Bug?
 
  # Popup screen
   - [ ] move ErrorPopup (in NewEventScreen atm) to a separate file for modular reuse

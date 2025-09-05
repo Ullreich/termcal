@@ -49,11 +49,27 @@ EventCell {
 
 /* ------------- Event Screen ------------- */
 
-EventScreen {
+EventScreen Grid {
+    margin: 0 5 0 5;
+    grid-size: 5 7;
+    grid-rows: auto;
+    grid-columns: 1fr;
+    /* grid-rows: 2; TODO: this is still borked */
+    grid-gutter: 1;
+    height: auto;
 }
 
-EventScreen Label {
-    margin: 0 5 0 5;
+.type {
+    row-span: 1;
+    column-span: 1;
+}
+
+.data {
+    row-span: 1;
+    column-span: 4;
+    text-wrap: wrap;
+    width: auto;
+    overflow: auto;
 }
 
 EventScreen Rule {
@@ -66,15 +82,8 @@ EventScreen Rule {
     margin: 2 5 0 5;
 }
 
-#eventDescription {
-    text-wrap: wrap;
-    width: 100%;
-    overflow: auto;
-}
-
-#closeButton {
-    width: auto;
-    margin: 0 0 1 0;
+EventScreen Button {
+    margin: 1 0 1 0;
 }
 
 /* -------------- New Event Screen ------------- */
@@ -85,21 +94,37 @@ EventScreen Rule {
     margin: 2 5 0 5;
 }
 
-NewEventScreen Input {
-    margin: 1 5 1 5;
-}
-
-NewEventScreen Label {
-    margin: 0 5 0 5;
-}
-
 NewEventScreen Rule {
     margin: 0 5 0 5;
 }
 
 NewEventScreen HorizontalGroup {
-    align: center middle;
+    align: center bottom;
     margin: 0 0 1 0;
+}
+
+NewEventScreen Grid {
+    margin: 0 5 0 5;
+    grid-size: 5 5;
+    grid-rows: auto;
+    grid-columns: 1fr;
+    grid-gutter: 1;
+    height: auto;
+}
+
+NewEventScreen Grid Label {
+    row-span: 1;
+    column-span: 1;
+}
+
+NewEventScreen Grid Input {
+    row-span: 1;
+    column-span: 4;
+    width: 100%;
+}
+
+NewEventScreen Button {
+    margin: 1 0 1 0;
 }
 
 /* -------------- Error Popup ------------- */

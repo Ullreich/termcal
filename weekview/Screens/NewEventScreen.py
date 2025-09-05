@@ -1,7 +1,7 @@
 from textual.app import ComposeResult
 from textual.screen import Screen, ModalScreen
 from textual.widgets import Button, Footer, Label, Rule, Input
-from textual.containers import HorizontalGroup, VerticalScroll, Vertical
+from textual.containers import HorizontalGroup, VerticalScroll, Vertical, Grid
 from textual.validation import Length, ValidationResult, Validator
 
 from helpers import general_helpers as gh
@@ -56,36 +56,45 @@ class NewEventScreen(Screen):
         with VerticalScroll():
             yield Label("Create New Event", id="newEventTitle")
             yield Rule(line_style="ascii")
-
+            
             # Title
-            yield Label("Event Title:")
-            yield Input(placeholder="Enter event title",
-                        id="eventTitleInput",
-                        validators=[Length(1, 500)])
+            with Grid():
+                # Label
+                yield Label("Event Title:")
+                yield Input(placeholder="Enter event title",
+                            id="eventTitleInput",
+                            validators=[Length(1, 500)],
+                            compact=True)
 
-            # Start
-            yield Label("Start Time:")
-            yield Input(placeholder=f"8:00 {datetime.today().strftime('%d.%m.%Y')}",
-                        id="eventStartInput",
-                        validators=[isValidDate()])
+                # Start
+                yield Label("Start Time:")
+                yield Input(placeholder=f"8:00 {datetime.today().strftime('%d.%m.%Y')}",
+                            id="eventStartInput",
+                            validators=[isValidDate()],
+                            compact=True)
 
-            # End
-            yield Label("End Time:")
-            yield Input(placeholder=f"9:00 {datetime.today().strftime('%d.%m.%Y')}",
-                        id="eventEndInput",
-                        validators=[isValidDate()])
+                # End
+                yield Label("End Time:")
+                yield Input(placeholder=f"9:00 {datetime.today().strftime('%d.%m.%Y')}",
+                            id="eventEndInput",
+                            validators=[isValidDate()],
+                            compact=True)
 
-            # Location
-            yield Label("Location (optional):")
-            yield Input(placeholder="Enter location", id="eventLocation")
+                # Location
+                yield Label("Location (optional):")
+                yield Input(placeholder="Enter location",
+                            id="eventLocation",
+                            compact=True)
 
-            # Description
-            yield Label("Description (optional):")
-            yield Input(placeholder="Enter description", id="eventDescription")
+                # Description
+                yield Label("Description (optional):")
+                yield Input(placeholder="Enter description",
+                            id="eventDescription",
+                            compact=True)
 
-        with HorizontalGroup():
-            yield Button("Save Event", id="saveButton", variant="success")
-            yield Button("Cancel", id="cancelButton", variant="error")
+            with HorizontalGroup():
+                yield Button("Save Event", id="saveButton", variant="success")
+                yield Button("Cancel", id="cancelButton", variant="error")
         yield Footer()
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
