@@ -1,6 +1,4 @@
 from datetime import datetime, timedelta
-import re
-from typing import Optional
 from textual.color import Color
 
 
@@ -17,32 +15,7 @@ def get_week_start_from_date(date_input: str) -> datetime:
     Raises:
         ValueError: If the date format is invalid or the date is invalid
     """
-    # Common date formats to try
-    date_formats = [
-        '%Y-%m-%d',      # 2024-09-16
-        '%d.%m.%Y',      # 16.09.2024
-        '%d/%m/%Y',      # 16/09/2024
-        '%m/%d/%Y',      # 09/16/2024
-        '%Y/%m/%d',      # 2024/09/16
-        '%d-%m-%Y',      # 16-09-2024
-        '%m-%d-%Y',      # 09-16-2024
-    ]
-    
-    # Clean the input string
-    date_input = date_input.strip()
-    
-    # Try to parse the date with different formats
-    parsed_date = None
-    for fmt in date_formats:
-        try:
-            parsed_date = datetime.strptime(date_input, fmt)
-            break
-        except ValueError:
-            continue
-    
-    if parsed_date is None:
-        raise ValueError(f"Invalid date format: '{date_input}'. "
-                        f"Supported formats include: YYYY-MM-DD, DD.MM.YYYY, DD/MM/YYYY, MM/DD/YYYY")
+    parsed_date = validate_date_format(date_input)
     
     # Validate the date is reasonable (not too far in past/future)
     current_year = datetime.now().year
@@ -59,8 +32,8 @@ def get_week_start_from_date(date_input: str) -> datetime:
     
     return week_start
 
-
-def validate_date_format(date_string: str) -> bool:
+# TODO: is this a good function? is it even ever used? 
+def validate_date_format(date_input: str, include_time = False) -> datetime:
     """
     Validate if a date string has a supported format.
     
@@ -68,13 +41,62 @@ def validate_date_format(date_string: str) -> bool:
         date_string: The date string to validate
         
     Returns:
-        bool: True if the format is valid, False otherwise
+        datetime if is a date, otherwise raises exception
     """
-    try:
-        get_week_start_from_date(date_string)
-        return True
-    except ValueError:
-        return False
+    # Common date formats to try
+    date_formats = [
+        '%Y-%m-%d',      # 2024-09-16
+        '%d.%m.%Y',      # 16.09.2024
+        '%d/%m/%Y',      # 16/09/2024
+        '%m/%d/%Y',      # 09/16/2024
+        '%Y/%m/%d',      # 2024/09/16
+        '%d-%m-%Y',      # 16-09-2024
+        '%m-%d-%Y',      # 09-16-2024
+    ]
+    
+    time_formats = [
+        '%H:%M',         # 08:25
+    ]
+
+    time_separators = [
+        ':',
+        ' ',
+        '/',
+    ]
+
+    # Clean the input string
+    date_input = date_input.strip()
+    
+    # Try to parse the date with different formats
+    if include_time:
+        iteration_formats = []
+
+        for time in time_formats:
+            for separators in time_separators:
+                for date in date_formats:
+                    iteration_formats.append(time+separators+date)
+                    iteration_formats.append(date+separators+time)
+        # TODO: implement better, just for testing atm
+        # if __name__ == "__main__":
+        #     for i in iteration_formats:
+        #         print(i)
+
+    else:
+        iteration_formats = date_formats
+
+    parsed_date = None
+    for fmt in iteration_formats:
+        try:
+            parsed_date = datetime.strptime(date_input, fmt)
+            break
+        except ValueError:
+            continue
+    
+    # if parsed_date is None:
+    #     raise ValueError(f"Invalid date format: '{date_input}'. "
+    #                    f"Supported formats include: YYYY-MM-DD, DD.MM.YYYY, DD/MM/YYYY, MM/DD/YYYY")
+    
+    return parsed_date
     
 def convert_summary_to_color(summary: str) -> Color:
     """
@@ -99,3 +121,13 @@ def convert_summary_to_color(summary: str) -> Color:
     b = (57 * (sum(bitstring[int(2*len(bitstring)/3):]) % 255)) % 192
 
     return Color(r,g,b)
+
+# TODO: move to actual testing files
+if __name__ == "__main__":
+    val = validate_date_format("14:25 2024-12-4", True)
+    if val:
+        print(val)
+
+    val = validate_date_format("14 25 2024-12-4", True)
+    if val:
+        print(val)

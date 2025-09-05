@@ -1,13 +1,10 @@
 import icalendar
 from pathlib import Path
-#Copilot-----
 from datetime import datetime, timedelta
 from typing import List, Dict, Any
-#------------
 
 ics_path = Path("./ETH_timetable.ics")
 
-#Copilot--------
 def get_week_events(week_start_utc: datetime, ics_file_path) -> List[Dict[str, Any]]:
     """
     Get all events from the ICS calendar for a given week.
