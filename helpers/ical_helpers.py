@@ -3,9 +3,9 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from typing import List, Dict, Any
 
-ics_path = Path("./ETH_timetable.ics")
+from icalendar import Calendar
 
-def get_week_events(week_start_utc: datetime, ics_file_path) -> List[Dict[str, Any]]:
+def get_week_events(week_start_utc: datetime, calendar: Calendar) -> List[Dict[str, Any]]:
     """
     Get all events from the ICS calendar for a given week.
     
@@ -18,9 +18,6 @@ def get_week_events(week_start_utc: datetime, ics_file_path) -> List[Dict[str, A
     """
     # Calculate week end (Sunday 23:59:59)
     week_end_utc = week_start_utc + timedelta(days=6, hours=23, minutes=59, seconds=59)
-    
-    # Load the calendar
-    calendar = icalendar.Calendar.from_ical(ics_file_path.read_bytes())
     
     week_events = []
     

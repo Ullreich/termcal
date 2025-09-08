@@ -9,6 +9,8 @@ from textual.containers import HorizontalGroup, VerticalScroll, Vertical
 
 from datetime import datetime, timedelta
 
+from icalendar import Calendar
+
 # Import helper modules
 from helpers import ical_helpers as ih
 from helpers import layout_helpers as lh
@@ -25,7 +27,7 @@ class WeekGrid(Widget):
     Returns:
         ComposeResult: The result of adding all events into a week grid view
     """
-    def __init__(self, ics_path: Path, week_start: datetime) -> None:
+    def __init__(self, calendar: Calendar, week_start: datetime) -> None:
         """Initialize the WeekGrid with calendar path and week start date.
         
         Args:
@@ -33,7 +35,7 @@ class WeekGrid(Widget):
             week_start: Start date of the week (Monday)
         """
         super().__init__()
-        self.ics_path = ics_path
+        self.calendar = calendar
         self.week_start = week_start
 
     def on_mount(self) -> None:
@@ -54,7 +56,7 @@ class WeekGrid(Widget):
         # generating week-array
         #-----------------------
         try:
-            events_this_week = ih.get_week_events(self.week_start, self.ics_path)
+            events_this_week = ih.get_week_events(self.week_start, self.calendar)
         except FileNotFoundError:
             print(f"ICS file not found at {self.ics_path}")
             events_this_week = []

@@ -13,6 +13,8 @@ from weekview.EventCell import EventCell
 from weekview.Screens.EventScreen import EventScreen
 from weekview.Screens.NewEventScreen import NewEventScreen
 
+from icalendar import Calendar
+
 class Week(App):
     """Main week view class."""
 
@@ -34,10 +36,11 @@ class Week(App):
         """
         super().__init__()
         self.ics_path = ics_path
+        self.calendar = Calendar.from_ical(ics_path.read_bytes())
         self.week_start = week_start
 
     def compose(self) -> ComposeResult:
-        yield WeekGrid(self.ics_path, self.week_start)
+        yield WeekGrid(self.calendar, self.week_start)
         yield Header()
         yield Footer()
 
