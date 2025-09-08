@@ -30,6 +30,7 @@
   - [x] on start/switching of week, start at 8:00
   - [x] assert cell height at least 1
   - [ ] sort list of list of events by number of events in list
+  - [ ] events displayed off by 15 sometimes?
 
 # coloring
 - [x] add coloring for event through function that maps title to color?
@@ -58,11 +59,11 @@
 # edit/add new events
 - [ ] implement a edit event in eventScreen
 - [x] implement a new event screen
-  - [ ] make Inputs compact
+  - [x] make Inputs compact
   - [ ] add inputted data to current calendar
     - [ ] does icalendar validate the data or do i need to do it? You can create custom validators
-    - [ ] validate start/end date (reuse that helper function)
-    - [ ] what type of inputtable variables exist?
+    - [x] validate start/end date (reuse that helper function)
+    - [ ] what type of inputtable variables exist?: see https://icalendar.readthedocs.io/en/stable/api.html under icalender.cal.Event ? i think maybe?
   - [ ] select button of which calendar(s) to add event to
   - [ ] delete event(s)
 - [ ] edit either all of the same title or just single one
@@ -78,6 +79,7 @@
 - [x] disable next and previous week when on eventScreen
 - [ ] fix width of button text: when resize sometimes cuts off the right hand side
 - [x] fix position of time:  when resize sometimes cuts off the right hand side
+- [ ] erroring when writing to calendar fucks up the calendar. that is bad
 
 # config file
 - [ ] edit key binds

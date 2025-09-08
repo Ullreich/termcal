@@ -71,23 +71,10 @@ class Week(App):
 
     def action_new_event_screen(self):
         """Open the new event screen and handle the returned data."""
-        new_event_screen = NewEventScreen()
-        self.push_screen(new_event_screen, callback=self._handle_new_event)
-
-    def _handle_new_event(self, event_data: dict | None) -> None:
-        """Handle the data returned from the NewEventScreen.
-        
-        Args:
-            event_data: The event data returned from the screen, or None if cancelled
-        """
-        if event_data:
-            # TODO: Integrate with actual calendar system
-            # For now, just show that we received the data
-            self.notify(f"New event created: {event_data['title']}")
-        else:
-            # User cancelled
-            self.notify("Event creation cancelled")
-
+        new_event_screen = NewEventScreen(self)
+        self.push_screen(new_event_screen)
+        # TODO: maybe find out how to get callbacks to work and do that instead of passing the whole app?
+        # self.push_screen(new_event_screen, callback=self._handle_new_event)
 
     def check_action(self, action: str, parameters) -> bool:
         """Disable certain actions when EventScreen or NewEventScreen is active.

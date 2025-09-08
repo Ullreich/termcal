@@ -1,4 +1,4 @@
-from textual.app import ComposeResult
+from textual.app import ComposeResult, App
 from textual.screen import Screen, ModalScreen
 from textual.widgets import Button, Footer, Label, Rule, Input
 from textual.containers import HorizontalGroup, VerticalScroll, Vertical, Grid
@@ -7,6 +7,10 @@ from textual.validation import Length, ValidationResult, Validator
 from helpers import general_helpers as gh
 
 from datetime import datetime
+
+from icalendar import Calendar, Event
+
+from uuid import uuid4
 
 class ErrorPopup(ModalScreen):
     """A modal popup screen for displaying error messages."""
@@ -41,11 +45,17 @@ class NewEventScreen(Screen):
     ]
     """Bindings for the event screen."""
 
-    def __init__(self) -> None:
+    def __init__(self, week_app: App) -> None:
         """Initialize the screen with Input widgets to add a new event.
+        
+        Args:
+            calendar: The iCalendar object to add the event to
+            week_app: Reference to the Week app for refreshing
+            calendar_path: Optional path to save the calendar file
         """
         super().__init__()
         self.event_data = {}
+        self.week_app = week_app
 
     def compose(self) -> ComposeResult:
         """Compose the event screen.
@@ -115,61 +125,82 @@ class NewEventScreen(Screen):
         if event.button.id == "saveButton":
             self._save_event()
         elif event.button.id == "cancelButton":
-            self.app.pop_screen()
+            self.app.pop_screen(None)  # Return None to indicate cancellation
 
     def action_save_event(self) -> None:
         """Action to save the event (triggered by Ctrl+S)."""
         self._save_event()
 
     def _save_event(self) -> None:
+        #TODO: this should be more compact with less code repetition
         """Collect input values and save the event."""
-        # Get input values
-
-        # TODO: make into icalendar Object instead
+        # get the data from the input fields
         title_input = self.query_one("#eventTitleInput", Input)
         start_input = self.query_one("#eventStartInput", Input)
         end_input = self.query_one("#eventEndInput", Input)
         location_input = self.query_one("#eventLocation", Input)
         description_input = self.query_one("#eventDescription", Input)
         
-        # Collect the data
-        self.event_data = {
-            "title": title_input.value.strip(),
-            "start": start_input.value.strip(),
-            "end": end_input.value.strip(),
+        # Parse and validate the input data
+        parsed_input_data = {
+            #metadata
+            "uid": str(uuid4()),
+            "dtstamp": datetime.now(),
+            #input_data
+            "summary": title_input.value.strip(),
+            "dtstart": gh.validate_date_format(start_input.value.strip(), include_time=True),
+            "dtend": gh.validate_date_format(end_input.value.strip(), include_time=True),
             "location": location_input.value.strip(),
-            "description": description_input.value.strip()
+            "description": description_input.value.strip(),
         }
-        
+
         # Handling input errors
         error_msg = None
+        error_field = None
         # Validate that we have the non-optional values
-        if not (self.event_data["title"] and
-                self.event_data["start"] and
-                self.event_data["end"]):
-            error_msg = "Error: missing required input"
+        if not title_input.value.strip():
+            error_msg = "Error: Event title is required"
+            error_field = title_input;
+        elif not gh.validate_date_format(start_input.value.strip(), include_time=True):
+            error_msg = "Error: Invalid start date/time format"
+            error_field = start_input
+        elif not gh.validate_date_format(end_input.value.strip(), include_time=True):
+            error_msg = "Error: Invalid end date/time format"
+            error_field = end_input
         # Assert that start < end
-        elif not (self.event_data["start"] < self.event_data["end"]):
-            error_msg = "Error: start date is after end date"
-        # if one of the errors occured, rais it
+        elif parsed_input_data["dtstart"] >= parsed_input_data["dtend"]:
+            error_msg = "Error: start date/time must be before end date/time"
+            error_field = start_input
+        
+        # If one of the errors occurred, raise it
         if error_msg:
             # Show error popup
             error_popup = ErrorPopup(error_msg)
             self.app.push_screen(error_popup)
-            title_input.focus()
+            error_field.focus()
             return
+
+        # Create the new event with proper iCalendar propertiess
+        new_event = Event()
+        for key, value in zip(parsed_input_data.keys(), parsed_input_data.values()):
+            new_event.add(key, value)
         
-        # For now, just write to file for testing (#TODO: integrate with calendar)
-        with open("new_events.txt", "a") as f:
-            f.write(f"Title: {self.event_data['title']}\n")
-            f.write(f"Start: {self.event_data['start']}\n")
-            f.write(f"End: {self.event_data['end']}\n")
-            f.write(f"Location: {self.event_data['location']}\n")
-            f.write(f"Description: {self.event_data['description']}\n")
-            f.write("---\n")
+        # Add the event to the calendar
+        self.week_app.calendar.add_component(new_event)
         
-        # Return the data and close screen
+        # Save the calendar back to the file
+        try:
+            with open(self.week_app.ics_path, 'wb') as f:
+                f.write(self.week_app.calendar.to_ical())
+        except Exception as e:
+            # Show error if saving fails
+            error_popup = ErrorPopup(f"Error saving calendar: {str(e)}")
+            self.app.push_screen(error_popup)
+            return
+
+        # Close screen & refresh week
         self.app.pop_screen()
+        self.app.refresh(recompose=True)
 
 # validator classes
 class isValidDate(Validator):
