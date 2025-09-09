@@ -27,16 +27,16 @@ class Week(App):
         ("a", "new_event_screen", "New Event")
     ]
     
-    def __init__(self, ics_path: Path, week_start: datetime) -> None:
+    def __init__(self, ical_path: Path, week_start: datetime) -> None:
         """Initialize the Week app with calendar path and week start date.
         
         Args:
-            ics_path: Path to the ICS calendar file
+            ical_path: Path to the ICS calendar file
             week_start: Start date of the week (Monday)
         """
         super().__init__()
-        self.ics_path = ics_path
-        self.calendar = Calendar.from_ical(ics_path.read_bytes())
+        self.ical_path = ical_path
+        self.calendar = Calendar.from_ical(ical_path.read_bytes())
         self.week_start = week_start
 
     def compose(self) -> ComposeResult:
@@ -71,7 +71,7 @@ class Week(App):
 
     def action_new_event_screen(self):
         """Open the new event screen and handle the returned data."""
-        new_event_screen = NewEventScreen(self)
+        new_event_screen = NewEventScreen(self.calendar, self.ical_path)
         self.push_screen(new_event_screen)
         # TODO: maybe find out how to get callbacks to work and do that instead of passing the whole app?
         # self.push_screen(new_event_screen, callback=self._handle_new_event)

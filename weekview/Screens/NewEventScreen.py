@@ -8,7 +8,9 @@ from helpers import general_helpers as gh
 
 from datetime import datetime
 
-from icalendar import Event
+from icalendar import Calendar, Event
+
+from pathlib import Path
 
 from uuid import uuid4
 
@@ -18,22 +20,21 @@ class NewEventScreen(Screen):
     """A screen that allows you to add a new event."""
 
     BINDINGS = [
-        ("escape,space,q", "app.pop_screen", "Close"),
+        ("q,escape", "app.pop_screen", "Close"),
         ("ctrl+s", "save_event", "Save Event"),
     ]
-    """Bindings for the event screen."""
 
-    def __init__(self, week_app: App) -> None:
+    def __init__(self, calendar: Calendar, ical_path: Path) -> None:
         """Initialize the screen with Input widgets to add a new event.
         
         Args:
             calendar: The iCalendar object to add the event to
-            week_app: Reference to the Week app for refreshing
             calendar_path: Optional path to save the calendar file
         """
         super().__init__()
         self.event_data = {}
-        self.week_app = week_app
+        self.calendar = calendar
+        self.ical_path = ical_path
 
     def compose(self) -> ComposeResult:
         """Compose the event screen.
@@ -164,12 +165,12 @@ class NewEventScreen(Screen):
             new_event.add(key, value)
         
         # Add the event to the calendar
-        self.week_app.calendar.add_component(new_event)
+        self.calendar.add_component(new_event)
         
         # Save the calendar back to the file
         try:
-            with open(self.week_app.ics_path, 'wb') as f:
-                f.write(self.week_app.calendar.to_ical())
+            with open(self.ical_path, 'wb') as f:
+                f.write(self.calendar.to_ical())
         except Exception as e:
             # Show error if saving fails
             error_popup = ErrorPopup(f"Error saving calendar: {str(e)}")

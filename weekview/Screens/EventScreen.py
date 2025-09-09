@@ -8,8 +8,7 @@ import GLOBALS
 class EventScreen(Screen):
     """A screen that displays details for a specific calendar event."""
 
-    BINDINGS = [("escape,space,q", "app.pop_screen", "Close")]
-    """Bindings for the event screen."""
+    BINDINGS = [("q,escape", "app.pop_screen", "Close")]
 
     def __init__(self, ical_event: dict) -> None:
         """Initialize the event screen with event data.
