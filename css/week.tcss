@@ -1,5 +1,6 @@
 $hour_height: 4;
 $bar_height: 2;
+$overlap_bar_height: 1;
 
 .topBar {
     height: $bar_height;
@@ -10,7 +11,6 @@ $bar_height: 2;
     width: 9vw;
     background: $surface;
     color: $primary;
-    padding: 1 0 0 0;
     height: $bar_height
 }
 
@@ -45,6 +45,50 @@ EventCell {
     text-wrap: wrap;
     width: 100%;
     overflow: auto;
+}
+
+/* ------------- overlap bar -------------- */
+.overlapBar {
+    height: $overlap_bar_height;
+}
+
+.overlapIndicatorLabel {
+    text-align: center;
+    width: 9vw;
+    background: $surface;
+    color: $text-accent;
+    height: $overlap_bar_height
+}
+
+.overlapGridBar {
+    text-align: center;
+    width: 13%;
+    background: $surface;
+    color: $text-accent;
+    height: $overlap_bar_height;
+}
+
+.nextPrevButton {
+    row-span: 1;
+    column-span: 1;
+    color: $text-accent;
+}
+
+.innerText {
+    row-span: 1;
+    column-span: 2;
+    width: 100%;
+    text-align: center;
+    background: $surface;
+    color: $text-accent;
+}
+
+.overlapGrid {
+    grid-size: 4 1;
+    grid-rows: auto;
+    grid-columns: 1fr;
+    width: 13%;
+    height: 1;
 }
 
 /* ------------- Event Screen ------------- */

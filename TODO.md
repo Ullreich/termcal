@@ -8,10 +8,6 @@
 - [ ] split up css
 - [ ] in EventScreen, the grid-rows parameter is still wonky giving Labels more padding/margins than they need. Bug?
 
- # Popup screen
-  - [ ] move ErrorPopup (in NewEventScreen atm) to a separate file for modular reuse
-  - [ ] fix keycapturing when in popup screen
-
 # command line args
 
 # next/prev week
@@ -20,7 +16,6 @@
 # alignment
 - [ ] account for multi-day events
 - [ ] make resolution more modular/editable by user?
-- [ ] sort list of list of events by number of events in list
 - [ ] events displayed off by 15 sometimes?
 
 # coloring
@@ -42,7 +37,7 @@
 - [ ] rename some variables?
 - [ ] make pep8 compliant: get vscode plugin
 - [ ] restructure code
-  - [ ] read up on import best practices
+- [ ] read up on import best practices
 
 # edit/add new events
 - [ ] implement a edit event in eventScreen

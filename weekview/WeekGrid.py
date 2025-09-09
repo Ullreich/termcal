@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from textual.app import ComposeResult
 from textual.widget import Widget
-from textual.widgets import Label
-from textual.containers import HorizontalGroup, VerticalScroll, Vertical
+from textual.widgets import Label, Button
+from textual.containers import HorizontalGroup, Grid, VerticalScroll, Vertical
 
 from datetime import datetime, timedelta
 
@@ -18,6 +18,20 @@ from weekview.EventCell import EventCell
 
 # Import constants
 import GLOBALS
+
+class NextButton(Button):
+    """button to increment the overlap event"""
+    def __init__(self, weekday: str, nr_overlaps: int, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.weekday = weekday
+        self.nr_overlaps = nr_overlaps
+
+class PrevButton(Button):
+    """button to decrement the overlap event"""
+    def __init__(self, weekday: str, nr_overlaps: int, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.weekday = weekday
+        self.nr_overlaps = nr_overlaps
 
 class WeekGrid(Widget):
     """The main Grid of events of a week
@@ -35,13 +49,15 @@ class WeekGrid(Widget):
         super().__init__()
         self.calendar = calendar
         self.week_start = week_start
+        self.overlap_index = {day: 0 for day in GLOBALS.WEEK_DAYS}
+        self.vscroll = None
 
     def on_mount(self) -> None:
         """Called when the WeekGrid is mounted. Set initial scroll position."""
         # Set initial scroll position to around 8 AM (adjust as needed)
-        scroll_widget = self.query_one("#week-scroll", VerticalScroll)
+        # scroll_widget = self.query_one("#week-scroll", VerticalScroll)
         initial_scroll_y = 8 * GLOBALS.HOUR_HEIGHT
-        self.call_after_refresh(lambda: scroll_widget.scroll_to(y=initial_scroll_y, animate=False))
+        self.call_after_refresh(lambda: self.vscroll.scroll_to(y=initial_scroll_y, animate=False))
 
 
     def compose(self) -> ComposeResult:
@@ -53,6 +69,7 @@ class WeekGrid(Widget):
         #-----------------------
         # generating week-array
         #-----------------------
+        # TODO: this should be in the week.py
         try:
             events_this_week = ih.get_week_events(self.week_start, self.calendar)
         except FileNotFoundError:
@@ -75,10 +92,15 @@ class WeekGrid(Widget):
             dayList += [Label(formatted_date_str, classes="weekdayTopBar")]
         
         yield HorizontalGroup(
+            # TODO: move this to daylist init
             Label("time\n", classes="timesTopBar"),
             *dayList,
             classes="topBar"
         )
+
+        # generate overlap bar
+        #TODO: should be a grid later (?), for now proof of concept
+        overlap_bar = [Label("overlap", classes="overlapIndicatorLabel")]
 
         # create a column of times
         timesList = [Label(str(i)+":00", classes="timesLabel") for i in range(24)]
@@ -93,13 +115,28 @@ class WeekGrid(Widget):
             if len(overlap_list) != 0:
                 height, padding = lh.calc_padding_and_height(overlap_list[0])
 
+            # make the next/prev button and label
+            if len(overlap_list) > 1:
+                g = Grid(
+                    PrevButton(weekday=day, nr_overlaps=len(overlap_list), label="<", classes="nextPrevButton", compact=True),
+                    Label(f"{self.overlap_index[day]+1}/{len(overlap_list)}", classes="innerText"),
+                    NextButton(weekday=day, nr_overlaps=len(overlap_list), label=">", classes="nextPrevButton", compact=True),
+                    classes="overlapGrid"
+                )
+
+                overlap_bar.append(g)
+            else:
+                overlap_bar.append(Label(classes="overlapGridBar"))
+
             #TODO: remove eventually
             # lh.write_overlap_list(overlap_list)
 
             # for event in (x for x in events_this_week if x["weekday"]==dayIndex):
             # for event in events_this_week:
+            oi = self.overlap_index[day]
+
             if len(overlap_list) != 0:
-                for event, i in zip(overlap_list[0], range(len(overlap_list[0]))):
+                for event, i in zip(overlap_list[oi], range(len(overlap_list[oi]))):
                     event_in_cell = EventCell(event)
                     event_in_cell.styles.height = height[i]
                     event_in_cell.styles.margin = (padding[i], 0, 0, 0)  # (top, right, bottom, left) - vertical spacing
@@ -109,10 +146,44 @@ class WeekGrid(Widget):
             # Create a Vertical container for each day
             dayContainer = Vertical(*dayList, classes="dayContainer")
             weekList.append(dayContainer)
+
+        #TODO: clean up
+        yield HorizontalGroup(
+            *overlap_bar,
+            classes="overlapBar"
+        )
         
         # Wrap the entire HorizontalGroup in a single VerticalScroll
         weekGroup = HorizontalGroup(*weekList)
         weekGroup.styles.height = "auto"
         
         # Create VerticalScroll with an ID so we can access it later
-        yield VerticalScroll(weekGroup, id="week-scroll")
+        self.vscroll = VerticalScroll(weekGroup, id="week-scroll")
+        yield self.vscroll
+    
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        """Handle button press events.
+
+        Args:
+            event: The button press event.
+        """
+        # Capture current scroll position before making changes
+        # TODO: ugly code lol
+        if isinstance(event.button, NextButton) or isinstance(event.button, PrevButton):
+            y_scroll = self.vscroll.scroll_y
+            
+            curr_index = self.overlap_index[event.button.weekday]
+                
+            if isinstance(event.button, NextButton):
+                # Increment and wrap around
+                curr_index = (curr_index + 1) % event.button.nr_overlaps
+            else:
+                curr_index = (curr_index - 1) % event.button.nr_overlaps
+
+            self.overlap_index[event.button.weekday] = curr_index
+
+            # Refresh this widget specifically
+            self.refresh(recompose=True)
+            
+            # Restore scroll position after refresh - get fresh reference to scroll widget
+            self.call_after_refresh(lambda: self.vscroll.scroll_to(y=y_scroll, animate=False))
