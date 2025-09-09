@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 from textual.app import ComposeResult
 from textual.widget import Widget
 from textual.widgets import Label
