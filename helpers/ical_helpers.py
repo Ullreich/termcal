@@ -3,9 +3,11 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from typing import List, Dict, Any
 
+from icalendar import Event
+
 from icalendar import Calendar
 
-def get_week_events(week_start_utc: datetime, calendar: Calendar) -> List[Dict[str, Any]]:
+def get_week_events(week_start_utc: datetime, calendar: Calendar) -> List[Event]:
     """
     Get all events from the ICS calendar for a given week.
     
@@ -32,6 +34,7 @@ def get_week_events(week_start_utc: datetime, calendar: Calendar) -> List[Dict[s
                 start_dt = event_start.dt
                 end_dt = event_end.dt
                 
+                # TODO: look over, does this make sense?
                 # Handle date vs datetime objects
                 if hasattr(start_dt, 'date'):
                     start_date = start_dt.date() if hasattr(start_dt, 'date') else start_dt
@@ -50,20 +53,9 @@ def get_week_events(week_start_utc: datetime, calendar: Calendar) -> List[Dict[s
                 # Event is in the week if it starts before week ends and ends after week starts
                 #TODO: handle multiweek events
                 if (start_date <= week_end_date and end_date >= week_start_date):
-                    event_data = {
-                        'summary': str(component.get('SUMMARY', 'No Title')),
-                        'description': str(component.get('DESCRIPTION', '')),
-                        'location': str(component.get('LOCATION', '')),
-                        'start': start_dt,
-                        'end': end_dt,
-                        'weekday': start_date.weekday(),
-                        'uid': str(component.get('UID', '')),
-                        'status': str(component.get('STATUS', '')),
-                        'organizer': str(component.get('ORGANIZER', ''))
-                    }
-                    week_events.append(event_data)
+                    week_events.append(component)
     
     # Sort events by start time
-    week_events.sort(key=lambda x: x['start'])
+    week_events.sort(key=lambda x: x.get('DTSTART').dt)
     
     return week_events

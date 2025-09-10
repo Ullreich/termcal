@@ -35,32 +35,32 @@ class EventScreen(Screen):
             ComposeResult: The result of composing the event screen.
         """
         with VerticalScroll():
-            yield Label(f"{self.ical_event['summary']}", id="eventTitle")
+            yield Label(f"{self.ical_event.get("SUMMARY")}", id="eventTitle")
             yield Rule(line_style="ascii")
             with Grid():
                 # Start
                 yield Label("Start:", classes="type")
-                yield Label(f"{GLOBALS.WEEK_DAYS[self.ical_event['weekday']]}, the {self.ical_event['start']}",
+                yield Label(f"{GLOBALS.WEEK_DAYS[self.ical_event.get("DTSTART").dt.weekday()]}, the {self.ical_event.get("DTSTART").dt}",
                             id="eventStart",
                             classes="data")
 
                 # End
                 yield Label("End:", classes="type")
-                yield Label(f"{GLOBALS.WEEK_DAYS[self.ical_event['weekday']]}, the {self.ical_event['end']}",
+                yield Label(f"{GLOBALS.WEEK_DAYS[self.ical_event.get("DTSTART").dt.weekday()]}, the {self.ical_event.get("DTEND").dt}",
                             id="eventEnd",
                             classes="data")
                 
                 # Location
                 if self.ical_event.get('location'):
                     yield Label("Location:", classes="type") 
-                    yield Label(f"{self.ical_event['location']}",
+                    yield Label(f"{self.ical_event.get("LOCATION")}",
                                 id="eventLocation",
                                 classes="data")
                 
                 # Description
                 if self.ical_event.get('description'):
                     yield Label("Description:", classes="type") 
-                    yield Label(f"{self.ical_event['description']}",
+                    yield Label(f"{self.ical_event.get("DESCRIPTION")}",
                                 id="eventDescription",
                                 classes="data")
             with Center():
