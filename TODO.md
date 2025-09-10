@@ -31,6 +31,7 @@
 - [ ] add vim keybinds?
 - [ ] add screen that shows all key commands (already available (editable?) under palette)
 - [ ] mouse button to escape from event view?
+- [ ] kb navigation for overlapping events
 
 # cleanup/refactoring/restructuring
 - [ ] make all variables lower_case_with_underscores instead of CapitalizedWords

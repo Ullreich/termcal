@@ -3,14 +3,21 @@ from textual.screen import Screen
 from textual.widgets import Button, Footer, Label, Rule
 from textual.containers import VerticalScroll, Center, Grid
 
+from icalendar import Event, Calendar
+
+from pathlib import Path
+
 import GLOBALS
 
 class EventScreen(Screen):
     """A screen that displays details for a specific calendar event."""
 
-    BINDINGS = [("q,escape", "app.pop_screen", "Close")]
+    BINDINGS = [
+        ("q,escape", "event_pop_screen", "Close"),
+        ("e", "edit_event", "Edit Event"),
+    ]
 
-    def __init__(self, ical_event: dict) -> None:
+    def __init__(self, ical_event: Event, calendar: Calendar, ical_path: Path) -> None:
         """Initialize the event screen with event data.
         
         Args:
@@ -18,6 +25,8 @@ class EventScreen(Screen):
         """
         super().__init__()
         self.ical_event = ical_event
+        self.calendar = calendar
+        self.ical_path = ical_path
 
     def compose(self) -> ComposeResult:
         """Compose the event screen.
@@ -66,3 +75,16 @@ class EventScreen(Screen):
         """
         if event.button.id == "closeButton":
             self.app.pop_screen()
+            # TODO: only refresh if edit_event was called
+            self.app.refresh(recompose=True)
+
+    def action_event_pop_screen(self) -> None:
+        self.app.pop_screen()
+        # TODO: only refresh if edit_event was called
+        self.app.refresh(recompose=True)
+    
+    def action_edit_event(self):
+        """Open the new event screen and handle the returned data."""
+        from weekview.Screens.EventEditScreen import EventEditScreen
+        edit_event_screen = EventEditScreen(self.ical_event, self.calendar, self.ical_path)
+        self.app.push_screen(edit_event_screen)

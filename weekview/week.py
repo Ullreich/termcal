@@ -52,7 +52,7 @@ class Week(App):
         """
         if isinstance(event.button, EventCell):
             # Create a new EventScreen instance with the event data
-            event_screen = EventScreen(event.button.ical_event)
+            event_screen = EventScreen(event.button.ical_event, self.calendar, self.ical_path)
             self.push_screen(event_screen)
 
     def on_mount(self) -> None:

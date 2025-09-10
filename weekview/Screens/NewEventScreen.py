@@ -1,7 +1,7 @@
-from textual.app import ComposeResult, App
-from textual.screen import Screen, ModalScreen
+from textual.app import ComposeResult
+from textual.screen import Screen
 from textual.widgets import Button, Footer, Label, Rule, Input
-from textual.containers import HorizontalGroup, VerticalScroll, Vertical, Grid
+from textual.containers import HorizontalGroup, VerticalScroll, Grid
 from textual.validation import Length, ValidationResult, Validator
 
 from helpers import general_helpers as gh
@@ -104,7 +104,7 @@ class NewEventScreen(Screen):
         if event.button.id == "saveButton":
             self._save_event()
         elif event.button.id == "cancelButton":
-            self.app.pop_screen(None)  # Return None to indicate cancellation
+            self.app.pop_screen()
 
     def action_save_event(self) -> None:
         """Action to save the event (triggered by Ctrl+S)."""
