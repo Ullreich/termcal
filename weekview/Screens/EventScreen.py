@@ -27,6 +27,7 @@ class EventScreen(Screen):
         self.ical_event = ical_event
         self.calendar = calendar
         self.ical_path = ical_path
+        self.called_edit = False
 
     def compose(self) -> ComposeResult:
         """Compose the event screen.
@@ -74,17 +75,36 @@ class EventScreen(Screen):
             event: The button press event.
         """
         if event.button.id == "closeButton":
+            # Close this screen first to reveal WeekGrid
             self.app.pop_screen()
-            # TODO: only refresh if edit_event was called
-            self.app.refresh(recompose=True)
+            if self.called_edit:
+                self.refresh_and_restore_scroll()
 
     def action_event_pop_screen(self) -> None:
+        # Close this screen first to reveal WeekGrid
         self.app.pop_screen()
-        # TODO: only refresh if edit_event was called
+        if self.called_edit:
+            self.refresh_and_restore_scroll()
+
+    #TODO: make this a helper function?
+    def refresh_and_restore_scroll(self) -> None: 
+        # Capture current scroll position
+        y_scroll = 0
+        scroll_widget = self.app.query_one("#week-scroll", VerticalScroll)
+        y_scroll = scroll_widget.scroll_y
+
+        # Refresh and restore
         self.app.refresh(recompose=True)
-    
+
+        def restore_scroll() -> None:
+            new_scroll = self.app.query_one("#week-scroll", VerticalScroll)
+            new_scroll.scroll_to(y=y_scroll, animate=False)
+        
+        self.app.call_after_refresh(restore_scroll)
+
     def action_edit_event(self):
         """Open the new event screen and handle the returned data."""
         from weekview.Screens.EventEditScreen import EventEditScreen
+        self.called_edit = True
         edit_event_screen = EventEditScreen(self.ical_event, self.calendar, self.ical_path)
         self.app.push_screen(edit_event_screen)
