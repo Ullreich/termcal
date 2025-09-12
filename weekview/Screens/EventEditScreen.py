@@ -13,6 +13,7 @@ from icalendar import Calendar, Event, vDatetime
 from pathlib import Path
 
 from weekview.Screens.ErrorPopup import ErrorPopup
+from weekview.Screens.ConfirmationPopup import ConfirmationPopup
 
 from icalendar import Event
 
@@ -22,6 +23,7 @@ class EventEditScreen(Screen):
     BINDINGS = [
         ("q,escape", "app.pop_screen", "Close"),
         ("ctrl+s", "save_event", "Save Event"),
+        ("d", "delete_event", "Delete Event"),
     ]
 
     def __init__(self, ical_event: Event, calendar: Calendar, ical_path: Path) -> None:
@@ -44,7 +46,7 @@ class EventEditScreen(Screen):
             ComposeResult: The result of composing the event screen.
         """
         with VerticalScroll():
-            yield Label("Edit Event", id="newEventTitle")
+            yield Label("Edit Event", id="eventEditTitle")
             yield Rule(line_style="ascii")
             
             # Title
@@ -191,6 +193,63 @@ class EventEditScreen(Screen):
         self.app.pop_screen()
         # Recompose the screen now on top of the stack (EventScreen)
         self.app.screen.refresh(recompose=True)
+    
+    def action_delete_event(self) -> None:
+        # deletion action
+        def confirm_delete() -> None:
+            vevent = self.ical_event
+            removed = False
+            # Try by identity
+            try:
+                self.calendar.subcomponents.remove(vevent)
+                removed = True
+            except ValueError:
+                # Fallback by UID
+                uid = str(vevent.get('UID'))
+                for comp in list(self.calendar.walk('VEVENT')):
+                    if str(comp.get('UID')) == uid:
+                        self.calendar.subcomponents.remove(comp)
+                        removed = True
+                        break
+            if not removed:
+                self.app.push_screen(ErrorPopup("Event not found in calendar"))
+                return
+            
+            # TODO move this to helper
+            try:
+                with open(self.ical_path, 'wb') as f:
+                    f.write(self.calendar.to_ical())
+            except Exception as e:
+                self.app.push_screen(ErrorPopup(f"Error saving calendar: {str(e)}\nChanges will not be saved"))
+                return
+            # Close the edit screen and refresh WeekGrid preserving scroll
+            self.app.pop_screen()
+            self.app.pop_screen()
+            self.refresh_and_restore_scroll()
+
+        #cancel action
+        def cancel_delete() -> None:
+            # No-op; modal already closed
+            pass
+
+        popup = ConfirmationPopup(on_confirm=confirm_delete, on_cancel=cancel_delete, message="Do you really want to delete this event?")
+        self.app.push_screen(popup)
+
+    # TODO: move to helper function (ical_helpers)
+    def refresh_and_restore_scroll(self) -> None: 
+        # Capture current scroll position
+        y_scroll = 0
+        scroll_widget = self.app.query_one("#week-scroll", VerticalScroll)
+        y_scroll = scroll_widget.scroll_y
+
+        # Refresh and restore
+        self.app.refresh(recompose=True)
+
+        def restore_scroll() -> None:
+            new_scroll = self.app.query_one("#week-scroll", VerticalScroll)
+            new_scroll.scroll_to(y=y_scroll, animate=False)
+        
+        self.app.call_after_refresh(restore_scroll)
 
 # validator classes
 class isValidDate(Validator):

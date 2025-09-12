@@ -218,20 +218,9 @@ ErrorPopup {
     align: center middle;
 }
 
-#dialog {
-    grid-size: 2;
-    grid-gutter: 1 2;
-    grid-rows: 1fr 3;
-    padding: 0 1;
-    width: 60;
-    height: 11;
-    border: thick $background 80%;
-    background: $surface;
-}
-
 #errorPopup {
-    width: 60;
-    height: 11;
+    width: 60%;
+    height: auto;
     border: thick $background 80%;
     background: $surface;
     padding: 1;
@@ -256,6 +245,43 @@ ErrorPopup Button {
 }
 
 ErrorPopup HorizontalGroup {
+    align: center middle;
+    width: 100%;
+}
+
+/* -------------- Confirmation Popup ------------- */
+
+ConfirmationPopup {
+    align: center middle;
+}
+
+#confirmationPopup {
+    width: 60%;
+    height: auto;
+    border: thick $background 80%;
+    background: $surface;
+    padding: 1;
+    align: center middle;
+}
+
+ConfirmationPopup Label {
+    text-align: center;
+    width: 100%;
+    margin: 1 0;
+}
+
+ConfirmationPopup Vertical {
+    align: center middle;
+    height: 100%;
+}
+
+ConfirmationPopup Button {
+    width: auto;
+    margin: 1 0 0 0;
+    content-align: center middle;
+}
+
+ConfirmationPopup HorizontalGroup {
     align: center middle;
     width: 100%;
 }

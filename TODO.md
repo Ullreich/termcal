@@ -39,6 +39,7 @@
 - [ ] make pep8 compliant: get vscode plugin
 - [ ] restructure code
 - [ ] read up on import best practices
+- [ ] rename EventEditScreen to EditEventScreen
 
 # edit/add new events
 - [ ] implement a edit event in eventScreen
