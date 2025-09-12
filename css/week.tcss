@@ -171,6 +171,47 @@ NewEventScreen Button {
     margin: 1 0 1 0;
 }
 
+/* -------------- Event Edit Screen ------------- */
+
+#eventEditTitle {
+    text-align: center;
+    width: 100%;
+    margin: 2 5 0 5;
+}
+
+EventEditScreen Rule {
+    margin: 0 5 0 5;
+}
+
+EventEditScreen HorizontalGroup {
+    align: center bottom;
+    margin: 0 0 1 0;
+}
+
+EventEditScreen Grid {
+    margin: 0 5 0 5;
+    grid-size: 5 5;
+    grid-rows: auto;
+    grid-columns: 1fr;
+    grid-gutter: 1;
+    height: auto;
+}
+
+EventEditScreen Grid Label {
+    row-span: 1;
+    column-span: 1;
+}
+
+EventEditScreen Grid Input {
+    row-span: 1;
+    column-span: 4;
+    width: 100%;
+}
+
+EventEditScreen Button {
+    margin: 1 0 1 0;
+}
+
 /* -------------- Error Popup ------------- */
 
 ErrorPopup {
