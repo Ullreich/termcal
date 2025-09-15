@@ -16,7 +16,7 @@
 # alignment
 - [ ] account for multi-day events
 - [ ] make resolution more modular/editable by user?
-- [ ] events displayed off by 15 sometimes?
+- [ ] events displayed off by 15 sometimes? This is when there is an event that ends at the same time hat the new one start. fix this
 
 # coloring
 - [ ] depending on if light or dark color theme, edit function
