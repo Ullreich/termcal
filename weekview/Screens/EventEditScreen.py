@@ -131,7 +131,8 @@ class EventEditScreen(Screen):
         # Parse and validate the input data
         parsed_input_data = {
             #metadata
-            # "DTSAMP": datetime.now(),
+            # update timestamp
+            "DTSTAMP": vDatetime(datetime.now(timezone.utc)),
             #input_data
             "SUMMARY": title_input.value.strip(),
             "DTSTART": gh.validate_date_format(start_input.value.strip(), include_time=True),
@@ -165,9 +166,6 @@ class EventEditScreen(Screen):
             self.app.push_screen(error_popup)
             error_field.focus()
             return
-
-        # update timestamp
-        self.ical_event["DTSTAMP"] = vDatetime(datetime.now(timezone.utc))
 
         # overwrite new input
         for key, value in zip(parsed_input_data.keys(), parsed_input_data.values()):

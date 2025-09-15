@@ -5,8 +5,11 @@ from textual.containers import HorizontalGroup, VerticalScroll, Grid
 from textual.validation import Length, ValidationResult, Validator
 
 from helpers import general_helpers as gh
+from helpers import ical_helpers as ih
 
-from datetime import datetime
+from weekview.Screens.ErrorPopup import ErrorPopup
+
+from datetime import datetime, timezone
 
 from icalendar import Calendar, Event
 
@@ -14,8 +17,7 @@ from pathlib import Path
 
 from uuid import uuid4
 
-from weekview.Screens.ErrorPopup import ErrorPopup
-
+#TODO: make this a polymorphic base object
 class NewEventScreen(Screen):
     """A screen that allows you to add a new event."""
 
@@ -124,7 +126,7 @@ class NewEventScreen(Screen):
         parsed_input_data = {
             #metadata
             "uid": str(uuid4()),
-            "dtstamp": datetime.now(),
+            "dtstamp": datetime.now(timezone.utc),
             #input_data
             "summary": title_input.value.strip(),
             "dtstart": gh.validate_date_format(start_input.value.strip(), include_time=True),
@@ -168,18 +170,8 @@ class NewEventScreen(Screen):
         self.calendar.add_component(new_event)
         
         # Save the calendar back to the file
-        try:
-            with open(self.ical_path, 'wb') as f:
-                f.write(self.calendar.to_ical())
-        except Exception as e:
-            # Show error if saving fails
-            error_popup = ErrorPopup(f"Error saving calendar: {str(e)}")
-            self.app.push_screen(error_popup)
-            return
-
-        # Close screen & refresh week
-        self.app.pop_screen()
-        self.app.refresh(recompose=True)
+        # on successful write, close the screen
+        ih.save_to_file(ical_path=self.ical_path, calendar=self.calendar, main_app=self.app)
 
 # validator classes
 class isValidDate(Validator):
