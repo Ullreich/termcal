@@ -104,7 +104,7 @@ class EventScreen(Screen):
 
     def action_edit_event(self):
         """Open the new event screen and handle the returned data."""
-        from weekview.Screens.EventEditScreen import EventEditScreen
+        from weekview.Screens.BaseEditEventScreen import BaseEditEventScreen
         self.called_edit = True
-        edit_event_screen = EventEditScreen(self.ical_event, self.calendar, self.ical_path)
+        edit_event_screen = BaseEditEventScreen(self.calendar, self.ical_path, self.ical_event, )
         self.app.push_screen(edit_event_screen)

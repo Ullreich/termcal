@@ -1,10 +1,11 @@
-from textual.app import ComposeResult
+from textual.app import ComposeResult, App
 from textual.screen import Screen
 from textual.widgets import Button, Footer, Label, Rule, Input
 from textual.containers import HorizontalGroup, VerticalScroll, Grid
 from textual.validation import Length, ValidationResult, Validator
 
 from helpers import general_helpers as gh
+from helpers import layout_helpers as lh
 
 from datetime import datetime, timezone
 
@@ -17,27 +18,32 @@ from weekview.Screens.ConfirmationPopup import ConfirmationPopup
 
 from icalendar import Event
 
-class EventEditScreen(Screen):
+from typing import Optional
+
+from uuid import uuid4
+
+class BaseEditEventScreen(Screen):
     """A screen that allows you to edit an event."""
 
     BINDINGS = [
         ("q,escape", "app.pop_screen", "Close"),
         ("ctrl+s", "save_event", "Save Event"),
+        # TODO: add for edit of  event
         ("d", "delete_event", "Delete Event"),
     ]
 
-    def __init__(self, ical_event: Event, calendar: Calendar, ical_path: Path) -> None:
-        """Initialize the screen with Input widgets to add a new event.
+    def __init__(self, calendar: Calendar, ical_path: Path, ical_event: Optional[Event] = None) -> None:
+        """Initialize the screen with Input widgets to add or edit an event.
         
         Args:
             calendar: The iCalendar object to add the event to
             calendar_path: Optional path to save the calendar file
+            ical_event: an Event object to edit. Optional.
         """
         super().__init__()
-        self.ical_event = ical_event
-        self.event_data = {}
         self.calendar = calendar
         self.ical_path = ical_path
+        self.ical_event = ical_event
 
     def compose(self) -> ComposeResult:
         """Compose the event screen.
@@ -46,48 +52,62 @@ class EventEditScreen(Screen):
             ComposeResult: The result of composing the event screen.
         """
         with VerticalScroll():
-            yield Label("Edit Event", id="eventEditTitle")
+            yield Label("Edit Event", id="baseEditEventTitle")
             yield Rule(line_style="ascii")
             
             # Title
             with Grid():
                 # Label
                 yield Label("Event Title:")
-                yield Input(value=self.ical_event.get("SUMMARY"),
-                            placeholder="Enter event title",
+                ip = Input( placeholder="Enter event title",
                             id="eventTitleInput",
                             validators=[Length(1, 500)],
                             compact=True)
+                if self.ical_event:
+                    ip.value=self.ical_event.get("SUMMARY")
+                yield ip
 
                 # Start
                 yield Label("Start Time:")
-                yield Input(value=self.ical_event.get("DTSTART").dt.strftime("%H:%M %d.%m.%Y"),
-                            placeholder=f"8:00 {datetime.today().strftime('%d.%m.%Y')}",
+                ip = Input( placeholder=f"8:00 {datetime.today().strftime('%d.%m.%Y')}",
                             id="eventStartInput",
                             validators=[isValidDate()],
                             compact=True)
+                if self.ical_event:
+                    ip.value = self.ical_event.get("DTSTART").dt.strftime("%H:%M %d.%m.%Y")
+                else:
+                    ip.value = f"8:00 {datetime.today().strftime('%d.%m.%Y')}"
+                yield ip
 
                 # End
                 yield Label("End Time:")
-                yield Input(value=self.ical_event.get("DTEND").dt.strftime("%H:%M %d.%m.%Y"),
-                            placeholder=f"9:00 {datetime.today().strftime('%d.%m.%Y')}",
+                ip = Input( placeholder=f"9:00 {datetime.today().strftime('%d.%m.%Y')}",
                             id="eventEndInput",
                             validators=[isValidDate()],
                             compact=True)
+                if self.ical_event:
+                    ip.value=self.ical_event.get("DTEND").dt.strftime("%H:%M %d.%m.%Y")
+                else:
+                    ip.value = f"9:00 {datetime.today().strftime('%d.%m.%Y')}"
+                yield ip
 
                 # Location
                 yield Label("Location (optional):")
-                yield Input(value=self.ical_event.get("LOCATION"),
-                            placeholder="Enter location",
+                ip = Input( placeholder="Enter location",
                             id="eventLocation",
                             compact=True)
+                if self.ical_event:
+                    ip.value = self.ical_event.get("LOCATION")
+                yield ip
 
                 # Description
                 yield Label("Description (optional):")
-                yield Input(value=self.ical_event.get("DESCRIPTION"),
-                            placeholder="Enter description",
+                ip = Input( placeholder="Enter description",
                             id="eventDescription",
                             compact=True)
+                if self.ical_event:
+                    ip.value = self.ical_event.get("DESCRIPTION")
+                yield ip
 
             with HorizontalGroup():
                 yield Button("Save Event", id="saveButton", variant="success")
@@ -119,7 +139,6 @@ class EventEditScreen(Screen):
         self._save_event()
 
     def _save_event(self) -> None:
-        #TODO: this should be more compact with less code repetition
         """Collect input values and save the event."""
         # get the data from the input fields
         title_input = self.query_one("#eventTitleInput", Input)
@@ -131,12 +150,12 @@ class EventEditScreen(Screen):
         # Parse and validate the input data
         parsed_input_data = {
             #metadata
-            # update timestamp
+            "UID": str(uuid4()),
             "DTSTAMP": vDatetime(datetime.now(timezone.utc)),
             #input_data
             "SUMMARY": title_input.value.strip(),
-            "DTSTART": gh.validate_date_format(start_input.value.strip(), include_time=True),
-            "DTEND": gh.validate_date_format(end_input.value.strip(), include_time=True),
+            "DTSTART": vDatetime(gh.validate_date_format(start_input.value.strip(), include_time=True)),
+            "DTEND": vDatetime(gh.validate_date_format(end_input.value.strip(), include_time=True)),
             "LOCATION": location_input.value.strip(),
             "DESCRIPTION": description_input.value.strip(),
         }
@@ -155,7 +174,7 @@ class EventEditScreen(Screen):
             error_msg = "Error: Invalid end date/time format"
             error_field = end_input
         # Assert that start < end
-        elif parsed_input_data["DTSTART"] >= parsed_input_data["DTEND"]:
+        elif parsed_input_data["DTSTART"].dt >= parsed_input_data["DTEND"].dt:
             error_msg = "Error: start date/time must be before end date/time"
             error_field = start_input
         
@@ -166,33 +185,39 @@ class EventEditScreen(Screen):
             self.app.push_screen(error_popup)
             error_field.focus()
             return
-
+        
+        # if self.ical_event we are editing and only want to pop the edit screen
+        if not self.ical_event:
+            self.ical_event = Event()
+            self.calendar.add_component(self.ical_event)
         # overwrite new input
         for key, value in zip(parsed_input_data.keys(), parsed_input_data.values()):
-            # new_event.add(key, value)
-            if key == "DTEND":
-                self.ical_event[key] = vDatetime(value)
-            elif key == "DTSTART":
-                self.ical_event[key] = vDatetime(value)
+            if key == "UID" and self.ical_event.get("UID"):
+                pass
             else:
                 self.ical_event[key] = value
-        
-        # Save the calendar back to the file
+
+        self.save_to_disk()
+
+        lh.pop_all_screens(self.app)
+        lh.refresh_and_restore_scroll(self.app)
+    
+    def save_to_disk(self) -> None:
         try:
             with open(self.ical_path, 'wb') as f:
                 f.write(self.calendar.to_ical())
+                # self.app.push_screen(ErrorPopup("got here"))
         except Exception as e:
             # Show error if saving fails
             error_popup = ErrorPopup(f"Error saving calendar: {str(e)}")
             self.app.push_screen(error_popup)
             return
-        
-        # Close screen & refresh the calling screen (EventScreen)
-        self.app.pop_screen()
-        # Recompose the screen now on top of the stack (EventScreen)
-        self.app.screen.refresh(recompose=True)
+
     
     def action_delete_event(self) -> None:
+        # make sure we actually have an event to delete
+        if not self.ical_event:
+            return
         # deletion action
         def confirm_delete() -> None:
             vevent = self.ical_event
@@ -212,18 +237,10 @@ class EventEditScreen(Screen):
             if not removed:
                 self.app.push_screen(ErrorPopup("Event not found in calendar"))
                 return
+            self.save_to_disk()
             
-            # TODO move this to helper
-            try:
-                with open(self.ical_path, 'wb') as f:
-                    f.write(self.calendar.to_ical())
-            except Exception as e:
-                self.app.push_screen(ErrorPopup(f"Error saving calendar: {str(e)}\nChanges will not be saved"))
-                return
-            # Close the edit screen and refresh WeekGrid preserving scroll
-            self.app.pop_screen()
-            self.app.pop_screen()
-            self.refresh_and_restore_scroll()
+            lh.pop_all_screens(main_app=self.app)
+            lh.refresh_and_restore_scroll(self.app)
 
         #cancel action
         def cancel_delete() -> None:
@@ -232,22 +249,6 @@ class EventEditScreen(Screen):
 
         popup = ConfirmationPopup(on_confirm=confirm_delete, on_cancel=cancel_delete, message="Do you really want to delete this event?")
         self.app.push_screen(popup)
-
-    # TODO: move to helper function (ical_helpers)
-    def refresh_and_restore_scroll(self) -> None: 
-        # Capture current scroll position
-        y_scroll = 0
-        scroll_widget = self.app.query_one("#week-scroll", VerticalScroll)
-        y_scroll = scroll_widget.scroll_y
-
-        # Refresh and restore
-        self.app.refresh(recompose=True)
-
-        def restore_scroll() -> None:
-            new_scroll = self.app.query_one("#week-scroll", VerticalScroll)
-            new_scroll.scroll_to(y=y_scroll, animate=False)
-        
-        self.app.call_after_refresh(restore_scroll)
 
 # validator classes
 class isValidDate(Validator):

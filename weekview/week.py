@@ -10,8 +10,8 @@ from datetime import datetime, timedelta
 # Import week view components
 from weekview.WeekGrid import WeekGrid
 from weekview.EventCell import EventCell
+from weekview.Screens.BaseEditEventScreen import BaseEditEventScreen
 from weekview.Screens.EventScreen import EventScreen
-from weekview.Screens.NewEventScreen import NewEventScreen
 
 from icalendar import Calendar
 
@@ -71,7 +71,7 @@ class Week(App):
 
     def action_new_event_screen(self):
         """Open the new event screen and handle the returned data."""
-        new_event_screen = NewEventScreen(self.calendar, self.ical_path)
+        new_event_screen = BaseEditEventScreen(self.calendar, self.ical_path)
         self.push_screen(new_event_screen)
         # TODO: maybe find out how to get callbacks to work and do that instead of passing the whole app?
         # self.push_screen(new_event_screen, callback=self._handle_new_event)
@@ -90,6 +90,6 @@ class Week(App):
         if action in ("next_week", "previous_week", "new_event_screen", "quit"):
             # Check if there are any EventScreen or NewEventScreen instances in the screen stack
             for screen in self.screen_stack:
-                if isinstance(screen, (EventScreen, NewEventScreen)):
+                if isinstance(screen, (EventScreen, BaseEditEventScreen)):
                     return False
         return super().check_action(action, parameters)
