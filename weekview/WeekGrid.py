@@ -171,13 +171,8 @@ class WeekGrid(Widget):
         Args:
             event: The button press event.
         """
-        # Capture current scroll position before making changes
-        # TODO: ugly code lol
         if isinstance(event.button, NextButton) or isinstance(event.button, PrevButton):
-            y_scroll = self.vscroll.scroll_y
-            
             curr_index = self.overlap_index[event.button.weekday]
-                
             if isinstance(event.button, NextButton):
                 # Increment and wrap around
                 curr_index = (curr_index + 1) % event.button.nr_overlaps
@@ -186,8 +181,5 @@ class WeekGrid(Widget):
 
             self.overlap_index[event.button.weekday] = curr_index
 
-            # Refresh this widget specifically
-            self.refresh(recompose=True)
-            
-            # Restore scroll position after refresh - get fresh reference to scroll widget
-            self.call_after_refresh(lambda: self.vscroll.scroll_to(y=y_scroll, animate=False))
+            # Refresh screen
+            lh.refresh_and_restore_scroll(self.app)

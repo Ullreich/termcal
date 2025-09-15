@@ -2,6 +2,8 @@ from math import floor
 
 from icalendar import Event
 
+from textual.app import App
+
 from typing import List
 
 
@@ -84,6 +86,17 @@ def timedelta_to_cell_height(timedelta, hour_height=4):
 def round_resolution(value, resolution=0.25):
     # rounds to resolution e.g. round_resolution(4.33) = 4.25
     return round(value/resolution) * resolution
+
+def pop_all_screens(main_app: App, depth = 1) -> None:
+    while len(main_app.screen_stack)>depth:
+        main_app.pop_screen()
+
+def refresh_and_restore_scroll(main_app: App) -> None:
+    from weekview.WeekGrid import WeekGrid
+    wg = main_app.query_one(WeekGrid)
+    y = wg.vscroll.scroll_y
+    wg.refresh(recompose=True)
+    wg.call_after_refresh(lambda: wg.vscroll.scroll_to(y=y, animate=False))
 
 # TODO: remove, just for testing atm
 if __name__ == "__main__":
