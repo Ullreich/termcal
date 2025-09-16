@@ -39,18 +39,16 @@
 - [ ] make pep8 compliant: get vscode plugin
 - [ ] restructure code
 - [ ] read up on import best practices
-- [ ] rename EventEditScreen to EditEventScreen
 
 # edit/add new events
-- [ ] implement a edit event in eventScreen
 - [ ] does icalendar validate the data or do i need to do it? You can create custom validators
   - [ ] what type of inputtable variables exist?: see https://icalendar.readthedocs.io/en/stable/api.html under icalender.cal.Event ? i think maybe?
   - [ ] select button of which calendar(s) to add event to
-  - [ ] delete event(s)
 - [ ] edit either all of the same title or just single one
   - [ ] edit all by iterating over whole dataset and replacing each probs
 - [ ] background color
 - [ ] name/time/etc
+- [ ] remove "delte event" from add new event Screen
 
 # implement calDav
 
