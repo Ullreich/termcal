@@ -67,3 +67,7 @@
 - [ ] rewrite install section
 - [ ] expand
 
+# License stuff
+- add reference licenses of other software used
+- agplv3 OR HIGHER thingy
+
