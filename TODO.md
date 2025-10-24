@@ -7,6 +7,7 @@
 - [ ] set font size on start
 - [ ] split up css
 - [ ] in EventScreen, the grid-rows parameter is still wonky giving Labels more padding/margins than they need. Bug?
+- [ ] add license
 
 # command line args
 
@@ -61,3 +62,8 @@
 # config file
 - [ ] edit key binds
 - [ ] edit hour resolution? (change in week_prototype.py and tcss)
+
+# README
+- [ ] rewrite install section
+- [ ] expand
+
